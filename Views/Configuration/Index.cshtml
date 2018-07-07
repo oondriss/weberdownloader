@@ -1,0 +1,223 @@
+﻿@model ConfigurationIndexViewModel
+@{
+	ViewData["Title"] = "Configuration";
+	var tab1Active = "";
+	var tab2Active = "";
+	var tab = TempData["tab"];
+	if (tab != null)
+	{
+		switch (tab)
+		{
+			case "1":
+				tab1Active = "active";
+				tab2Active = "";
+				break;
+			case "2":
+				tab1Active = "";
+				tab2Active = "active";
+				break;
+			default:
+				tab1Active = "active";
+				tab2Active = "";
+				break;
+		}
+	}
+}
+
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<h3>Configuration</h3>
+		<ul class="nav nav-tabs" id="myTabs" role="tablist">
+			<li role="presentation" class="@tab1Active">
+				<a href="#columns" id="columns-tab" role="tab" data-toggle="tab" aria-controls="columns" aria-expanded="true">Additional columns</a>
+			</li>
+			<li role="presentation" class="@tab2Active">
+				<a href="#screws" id="screws-tab" role="tab" data-toggle="tab" aria-controls="screws" aria-expanded="false">Screw heads</a>
+			</li>
+		</ul>
+
+		<div class="tab-content" id="myTabContent">
+			<div class="tab-pane fade active in" role="tabpanel" id="columns" aria-labelledby="columns-tab">
+				<p>
+					Additional columns allow you to define additional data columns that will be appended to exported file. Here you define only columns, values are added in screw heads' configuration. For example you can define additional column named 'Probably bad' or 'Precise location'
+				</p>
+				<br />
+				<h5>Current Additional Columns</h5>
+				<table class="table table-responsive table-bordered">
+					<thead>
+						<tr>
+							<td>
+								Id
+							</td>
+							<td>
+								Name
+							</td>
+							<td>
+								Description
+							</td>
+							<td>
+								Delete
+							</td>
+						</tr>
+					</thead>
+					@foreach (var addColumns in Model.AddColumns)
+					{
+						<tr>
+							<td>@addColumns.Id</td>
+							<td>@addColumns.Name</td>
+							<td>@addColumns.Description</td>
+							<td><a asp-controller="Configuration" asp-action="DeleteColumn" asp-route-id="@addColumns.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
+						</tr>
+					}
+				</table>
+				<br />
+				<h5>Add Additional Column</h5>
+				<form asp-action="CreateAdditionalColumn" asp-controller="Configuration" asp-antiforgery="true">
+					<div class="form-group">
+						<label asp-for="AddNewName"></label>
+						<input asp-for="AddNewName" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label asp-for="AddNewDesc"></label>
+						<input asp-for="AddNewDesc" class="form-control" />
+					</div>
+					<div class="form-group">
+						<input type="submit" />
+					</div>
+				</form>
+			</div>
+			<div class="tab-pane fade" role="tabpanel" id="screws" aria-labelledby="screw-tab">
+				<p>
+					Screw configuration allow you to configure all screw heads, their IP, location, scheduling of downloading data and values for additional columns.
+				</p>
+				<br />
+				<h5>Current Screw Heads</h5>
+				<table class="table table-responsive table-bordered">
+					<thead>
+						<tr>
+							<td>
+								Id
+							</td>
+							<td>
+								Name
+							</td>
+							<td>
+								Location
+							</td>
+							<td>
+								Hall
+							</td>
+							<td>
+								CronExp
+							</td>
+							<td>
+								Delete
+							</td>
+						</tr>
+					</thead>
+					@foreach (var head in Model.Heads)
+					{
+						<tr>
+							<td>@head.Id</td>
+							<td>@head.Name</td>
+							<td>@head.Location</td>
+							<td>@head.Hall</td>
+							<td>@head.CronExp</td>
+							<td><a asp-controller="Configuration" asp-action="DeleteHead" asp-route-id="@head.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
+						</tr>
+					}
+				</table>
+				<br />
+				<h5>Add Screw Head</h5>
+				<form asp-action="AddHead" asp-controller="Configuration" asp-antiforgery="true">
+					<div class="form-group">
+						<label asp-for="HeaNewName" ></label>
+						<input asp-for="HeaNewName" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label asp-for="HeaNewLocation" ></label>
+						<input asp-for="HeaNewLocation" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label asp-for="HeaNewHall"></label>
+						<input asp-for="HeaNewHall" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label asp-for="HeaNewCronExp"></label>
+						<input asp-for="HeaNewCronExp" class="form-control" />
+					</div>
+					<br />
+					<table class="table table-responsive table-striped">
+						<thead>
+							<tr>
+								<td>
+									Column name
+								</td>
+								<td>
+									Column value
+								</td>
+							</tr>
+						</thead>
+						@foreach (var item in Model.HeaNewAddColls)
+						{
+							<tr>
+								<td>
+									@Model.AddColumns.ToList().Single(i=> i.Id == item.Key).Name
+								</td>
+								<td>
+									<input type="text" name="@("HeaNewAddColls[" + item.Key + "]")" value="@item.Value" />
+								</td>
+							</tr>
+						}
+					</table>
+
+					<div class="form-group">
+						<input type="submit" />
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+		@*<div class="col-md-3">
+				<h2>Application uses</h2>
+				<ul>
+					<li>Sample pages using ASP.NET Core MVC</li>
+					<li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
+				</ul>
+			</div>
+			<div class="col-md-3">
+				<h2>How to</h2>
+				<ul>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=398600">Add a Controller and View</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
+				</ul>
+			</div>
+			<div class="col-md-3">
+				<h2>Overview</h2>
+				<ul>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
+				</ul>
+			</div>
+			<div class="col-md-3">
+				<h2>Run &amp; Deploy</h2>
+				<ul>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
+					<li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure Web Apps</a></li>
+				</ul>
+			</div>*@
+	</div>
