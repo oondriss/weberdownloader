@@ -153,5 +153,19 @@ namespace TestApp.Services
 				return false;
 			}
 		}
+
+	    public async Task<bool> AddJobLog(JobLog instance)
+	    {
+		    try
+		    {
+			    await _db.JobLogs.AddAsync(instance);
+			    return await _db.SaveChangesAsync() > 0;
+		    }
+		    catch (Exception e)
+		    {
+				_logger.LogError(e, "Error while saving JobLog");
+			    return false;
+		    }
+	    }
 	}
 }

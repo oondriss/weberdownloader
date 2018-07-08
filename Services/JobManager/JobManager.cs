@@ -27,9 +27,10 @@ namespace TestApp.Services
 				var allHeads = _dbManager.GetHeadsAsync();
 				foreach (var head in await allHeads)
 				{
-					var id = $"HE:{head.Id.ToString()}LO:{head.Location}HA:{head.Hall}";
+					var id = $"HE:'{head.Id.ToString()}'HN:'{head.Name}'HL:'{head.Hall}'";
 
 					RecurringJob.AddOrUpdate<WeberReader>(id, i => i.ReadWeberData(head.Id, head.Name, head.Location), head.CronExp);
+					_logger.LogInformation("Job id: '{0}' for head id: '{1}' name: '{2}' loc: '{3}' successfully scheduled.", id, head.Id, head.Name, head.Location);
 				}
 				return true;
 			}

@@ -15,5 +15,6 @@ namespace TestApp.Services
 		Task<bool> RemoveAdditionalColumn(int id);
 		IEnumerable<AdditionalColumn> GetAdditionalColumns();
 		Task<bool> AddAdditionalColumn(string addNewName, string addNewDesc);
+		Task<bool> AddJobLog(JobLog instance);
 	}
 }
