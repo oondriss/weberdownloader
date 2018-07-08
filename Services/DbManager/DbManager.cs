@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.Storage;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NCrontab;
 using TestApp.DbModels;
 
 namespace TestApp.Services
@@ -20,11 +24,12 @@ namespace TestApp.Services
 
 		public bool IsConfigurationComplete()
 		{
-			return _db.Heads.Any() && _db.JobLogs.Any();
+			return _db.Heads.Any();
 		}
 
-		public IEnumerable<Head> GetHeads()
+		public async Task<IQueryable<Head>> GetHeadsAsync()
 		{
+			await _db.Heads.LoadAsync();
 			return _db.Heads;
 		}
 
@@ -32,6 +37,72 @@ namespace TestApp.Services
 		{
 			return await _db.Heads.FindAsync(id);
 		}
+
+	    public async Task<bool> RemoveHeadAndAdditionalValues(int id)
+	    {
+		    bool result;
+		    var itemToRemove = await _db.Heads.FindAsync(id);
+		    if (itemToRemove != null)
+		    {
+			    var addValuesToDelete = _db.AdditionalValues.Where(i => i.Head == itemToRemove);
+				_db.AdditionalValues.RemoveRange(addValuesToDelete);
+
+			    _db.Heads.Remove(itemToRemove);
+			    try
+			    {
+				    await _db.SaveChangesAsync();
+				    result = true;
+			    }
+			    catch (Exception ex)
+			    {
+				    _logger.LogError(ex, "Failed while deleting HEAD with Id: {0}", id);
+				    result = false;
+			    }
+		    }
+		    else
+		    {
+			    result = false;
+			    _logger.LogError("Failed while deleting HEAD with Id: {0}, no record found", id);
+		    }
+		    return result;
+		}
+
+	    public async Task<bool> AddHead(string name, string location, string hall, string cron, Dictionary<int, string> addValues)
+	    {
+		    
+		    
+		    var newHead = new Head
+		    {
+			    Name = name,
+			    Location = location,
+			    Hall = hall,
+			    CronExp = cron
+			};
+
+			_db.Heads.Add(newHead);
+
+		    foreach (var addValue in addValues)
+		    {
+			    var addColl = await _db.AdditionalColumns.FindAsync(addValue.Key);
+			    var newAddValue = new AdditionalValue
+			    {
+				    Column = addColl,
+				    Head = newHead,
+				    Value = addValue.Value
+			    };
+			    _db.AdditionalValues.Add(newAddValue);
+		    }
+
+		    try
+		    {
+			    return await _db.SaveChangesAsync() > 0;
+		    }
+		    catch (Exception ex)
+		    {
+			    _logger.LogError(ex, "Error while saving new head");
+			    return false;
+		    }
+	    }
 
 		public IEnumerable<AdditionalColumn> GetAdditionalColumns()
 		{

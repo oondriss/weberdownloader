@@ -24,6 +24,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="2.2.3" />
+    <PackageReference Include="ncrontab" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>

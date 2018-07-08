@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Newtonsoft.Json;
 
@@ -19,26 +20,21 @@ namespace TestApp.Extensions
 				} 
 			};
 
-			if (tempdata[AlertTag] != null)
+			//Newtonsoft.Json.JsonConvert.SerializeObject()
+			var currentMessages = tempdata[AlertTag]?.ToString().Deserialize<List<MessageDefinion>>();
+			if (currentMessages != null)
 			{
-				var currentMessages = JsonConvert.DeserializeObject<List<MessageDefinion>>(tempdata[AlertTag].ToString());
-				if (currentMessages != null)
-				{
-					messageList.AddRange(currentMessages);
-				}
+				messageList.AddRange(currentMessages);
 			}
 
-			tempdata[AlertTag] = JsonConvert.SerializeObject(messageList);
+			tempdata[AlertTag] = messageList.SerializeObject();
 		}
 
 		public static List<MessageDefinion> GetAndRemoveMessages(this ITempDataDictionary tempdata)
 		{
 			var mess = tempdata[AlertTag];
 
-			var result = 
-				mess != null 
-				? JsonConvert.DeserializeObject<List<MessageDefinion>>(mess.ToString()) 
-				: null;
+			var result = mess?.ToString().Deserialize<List<MessageDefinion>>();
 
 			tempdata[AlertTag] = null;
 			return result;

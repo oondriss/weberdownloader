@@ -1,8 +1,9 @@
 ﻿@model ConfigurationIndexViewModel
 @{
 	ViewData["Title"] = "Configuration";
-	var tab1Active = "";
+	var tab1Active = "active";
 	var tab2Active = "";
+	var tab3Active = "";
 	var tab = TempData["tab"];
 	if (tab != null)
 	{
@@ -22,6 +23,7 @@
 				break;
 		}
 	}
+	var confOk = Model.ConfigurationReadyToStart ? "" : "hidden";
 }
 
 <div class="row">
@@ -34,10 +36,13 @@
 			<li role="presentation" class="@tab2Active">
 				<a href="#screws" id="screws-tab" role="tab" data-toggle="tab" aria-controls="screws" aria-expanded="false">Screw heads</a>
 			</li>
+			<li role="presentation" class="@tab3Active @confOk">
+				<a href="#runs" id="runs-tab" role="tab" data-toggle="tab" aria-controls="runs" aria-expanded="false">Start Configuration</a>
+			</li>
 		</ul>
 
 		<div class="tab-content" id="myTabContent">
-			<div class="tab-pane fade active in" role="tabpanel" id="columns" aria-labelledby="columns-tab">
+			<div class="tab-pane @tab1Active" role="tabpanel" id="columns" aria-labelledby="columns-tab">
 				<p>
 					Additional columns allow you to define additional data columns that will be appended to exported file. Here you define only columns, values are added in screw heads' configuration. For example you can define additional column named 'Probably bad' or 'Precise location'
 				</p>
@@ -62,12 +67,12 @@
 					</thead>
 					@foreach (var addColumns in Model.AddColumns)
 					{
-						<tr>
-							<td>@addColumns.Id</td>
-							<td>@addColumns.Name</td>
-							<td>@addColumns.Description</td>
-							<td><a asp-controller="Configuration" asp-action="DeleteColumn" asp-route-id="@addColumns.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
-						</tr>
+					<tr>
+						<td>@addColumns.Id</td>
+						<td>@addColumns.Name</td>
+						<td>@addColumns.Description</td>
+						<td><a asp-controller="Configuration" asp-action="DeleteColumn" asp-route-id="@addColumns.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
+					</tr>
 					}
 				</table>
 				<br />
@@ -86,7 +91,7 @@
 					</div>
 				</form>
 			</div>
-			<div class="tab-pane fade" role="tabpanel" id="screws" aria-labelledby="screw-tab">
+			<div class="tab-pane @tab2Active" role="tabpanel" id="screws" aria-labelledby="screw-tab">
 				<p>
 					Screw configuration allow you to configure all screw heads, their IP, location, scheduling of downloading data and values for additional columns.
 				</p>
@@ -117,25 +122,25 @@
 					</thead>
 					@foreach (var head in Model.Heads)
 					{
-						<tr>
-							<td>@head.Id</td>
-							<td>@head.Name</td>
-							<td>@head.Location</td>
-							<td>@head.Hall</td>
-							<td>@head.CronExp</td>
-							<td><a asp-controller="Configuration" asp-action="DeleteHead" asp-route-id="@head.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
-						</tr>
+					<tr>
+						<td>@head.Id</td>
+						<td>@head.Name</td>
+						<td>@head.Location</td>
+						<td>@head.Hall</td>
+						<td>@head.CronExp</td>
+						<td><a asp-controller="Configuration" asp-action="DeleteHead" asp-route-id="@head.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
+					</tr>
 					}
 				</table>
 				<br />
 				<h5>Add Screw Head</h5>
 				<form asp-action="AddHead" asp-controller="Configuration" asp-antiforgery="true">
 					<div class="form-group">
-						<label asp-for="HeaNewName" ></label>
+						<label asp-for="HeaNewName"></label>
 						<input asp-for="HeaNewName" class="form-control" />
 					</div>
 					<div class="form-group">
-						<label asp-for="HeaNewLocation" ></label>
+						<label asp-for="HeaNewLocation"></label>
 						<input asp-for="HeaNewLocation" class="form-control" />
 					</div>
 					<div class="form-group">
@@ -160,14 +165,14 @@
 						</thead>
 						@foreach (var item in Model.HeaNewAddColls)
 						{
-							<tr>
-								<td>
-									@Model.AddColumns.ToList().Single(i=> i.Id == item.Key).Name
-								</td>
-								<td>
-									<input type="text" name="@("HeaNewAddColls[" + item.Key + "]")" value="@item.Value" />
-								</td>
-							</tr>
+						<tr>
+							<td>
+								@Model.AddColumns.ToList().Single(i=> i.Id == item.Key).Name
+							</td>
+							<td>
+								<input type="text" name="@("HeaNewAddColls[" + item.Key + "]")" value="@item.Value" />
+							</td>
+						</tr>
 						}
 					</table>
 
@@ -176,48 +181,29 @@
 					</div>
 				</form>
 			</div>
+			<div class="tab-pane @tab3Active @confOk" role="tabpanel" id="runs" aria-labelledby="runs-tab">
+				<p>
+					You can start scheduled jobs here. If any configuration needs to be changed, you need to stop scheduled jobs, change configuration and start scheduled jobs again.
+				</p>
+				<br />
+				<h5>Scheduled jobs</h5>
+
+				@if (Model.JobsRunning)
+				{
+					<span class="label label-success">Jobs running</span>
+					<form asp-controller="Configuration" asp-action="StopJobs" asp-antiforgery="true">
+						<button type="submit" class="btn btn-lg btn-default">Stop Jobs</button>
+					</form>
+				}
+				else
+				{
+					<span class="label label-danger">Jobs stopped</span>
+					<form asp-controller="Configuration" asp-action="StartJobs" asp-antiforgery="true">
+						<button type="submit" class="btn btn-lg btn-default">Start Jobs</button>
+					</form>
+				}
+
+			</div>
 		</div>
 	</div>
-
-
-
-
-
-		@*<div class="col-md-3">
-				<h2>Application uses</h2>
-				<ul>
-					<li>Sample pages using ASP.NET Core MVC</li>
-					<li>Theming using <a href="https://go.microsoft.com/fwlink/?LinkID=398939">Bootstrap</a></li>
-				</ul>
-			</div>
-			<div class="col-md-3">
-				<h2>How to</h2>
-				<ul>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=398600">Add a Controller and View</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699315">Manage User Secrets using Secret Manager.</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699316">Use logging to log a message.</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699317">Add packages using NuGet.</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699319">Target development, staging or production environment.</a></li>
-				</ul>
-			</div>
-			<div class="col-md-3">
-				<h2>Overview</h2>
-				<ul>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=518008">Conceptual overview of what is ASP.NET Core</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=699320">Fundamentals of ASP.NET Core such as Startup and middleware.</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=398602">Working with Data</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkId=398603">Security</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699321">Client side development</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699322">Develop on different platforms</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=699323">Read more on the documentation site</a></li>
-				</ul>
-			</div>
-			<div class="col-md-3">
-				<h2>Run &amp; Deploy</h2>
-				<ul>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=517851">Run your app</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=517853">Run tools such as EF migrations and more</a></li>
-					<li><a href="https://go.microsoft.com/fwlink/?LinkID=398609">Publish to Microsoft Azure Web Apps</a></li>
-				</ul>
-			</div>*@
-	</div>
+</div>

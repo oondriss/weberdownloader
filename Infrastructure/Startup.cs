@@ -39,7 +39,9 @@ namespace TestApp.Infrastructure
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddHangfire(x => x.UseMemoryStorage());
 			services.AddTransient<IDbManager, DbManager>();
+	        services.AddTransient<IJobManager, JobManager>();
 			services.AddTransient<IWeberReader, WeberReader>();
+	        services.AddTransient<ICronValitador, CronValidator>();
 			services.AddMvc();
         }
 		
