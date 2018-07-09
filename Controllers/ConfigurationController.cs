@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TestApp.Extensions;
 using TestApp.Services;
 using TestApp.ViewModel;
-using Hangfire;
 using Microsoft.Extensions.Logging;
-using NCrontab;
 
 namespace TestApp.Controllers
 {

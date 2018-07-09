@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Serialization;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Newtonsoft.Json;
 
 namespace TestApp.Extensions
 {

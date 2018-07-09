@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire;
-using Hangfire.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NCrontab;
 using TestApp.DbModels;
 
 namespace TestApp.Services
@@ -38,7 +35,14 @@ namespace TestApp.Services
 			return await _db.Heads.FindAsync(id);
 		}
 
-	    public async Task<bool> RemoveHeadAndAdditionalValues(int id)
+	    public IEnumerable<AdditionalValue> GetAdditionalValues(Head head)
+	    {
+		    return _db.AdditionalValues.Where(i => i.Head == head);
+	    }
+
+
+
+		public async Task<bool> RemoveHeadAndAdditionalValues(int id)
 	    {
 		    bool result;
 		    var itemToRemove = await _db.Heads.FindAsync(id);

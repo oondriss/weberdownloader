@@ -33,7 +33,7 @@ namespace TestApp.Infrastructure
 			
 			services.AddElm(opts =>
 			{
-				opts.Path = new PathString("/elm");
+				opts.Path = new PathString("/logs");
 				opts.Filter = (name, level) => level >= LogLevel.Trace;
 			});
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -45,7 +45,7 @@ namespace TestApp.Infrastructure
 			services.AddMvc();
         }
 		
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DatabaseContext dabataseContext)
         {
 			loggerFactory.AddLog4Net();
 			
@@ -61,7 +61,7 @@ namespace TestApp.Infrastructure
 
 			GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(app.ApplicationServices));
 			app.UseHangfireServer();
-			app.UseHangfireDashboard();
+			app.UseHangfireDashboard("/jobs");
 
 			app.UseMvc(routes =>
             {
@@ -69,6 +69,7 @@ namespace TestApp.Infrastructure
                     "default",
                     "{controller=Home}/{action=Index}/{id?}");
             });
-        }
+	        dabataseContext.Database.Migrate();
+		}
     }
 }
