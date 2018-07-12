@@ -105,18 +105,20 @@ namespace TestApp.Controllers
 			    if (cronExpr == null)
 			    {
 				    TempData.AddMessage("Error validating cron expression, see <a href='https://crontab.guru/#0_3,7,11,15,19,23_*_*_*' target='_blank'>this</a> example.", MessageType.Danger);
-				}
+				    TempData["tab"] = "2";
+				    return RedirectToAction("Index");
+			    }
+
+			    
+			    if (await _dbManager.AddHead(model.HeaNewName, model.HeaNewLocation, model.HeaNewHall, cronExpr.ToString(), model.HeaNewIp, model.HeaNewAddColls))
+			    {
+				    TempData.AddMessage("Record successfully added.", MessageType.Success);
+			    }
 			    else
 			    {
-				    if (await _dbManager.AddHead(model.HeaNewName, model.HeaNewLocation, model.HeaNewHall, cronExpr.ToString(), model.HeaNewAddColls))
-				    {
-					    TempData.AddMessage("Record successfully added.", MessageType.Success);
-				    }
-				    else
-				    {
-					    TempData.AddMessage("Exception has occured, check logs and try again.", MessageType.Danger);
-				    }
-				}
+				    TempData.AddMessage("Exception has occured, check logs and try again.", MessageType.Danger);
+			    }
+			
 		    }
 		    else
 		    {

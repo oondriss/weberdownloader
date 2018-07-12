@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-
+using System.Runtime.InteropServices;
 
 namespace TestApp.Services
 {
@@ -3155,7 +3155,23 @@ namespace TestApp.Services
 
 		private bool[] EventIntern;
 
-		private ILogger _logger;
+		private ILogger log;
+
+		public string TorqueUnitName = "";
+
+		public float TorqueConvert = 1f;
+
+		private byte SaveBlockStatus;
+
+		private int LifeSign;
+
+		private byte Block1Status;
+
+		private byte Block2Status;
+
+		private byte StatDeleteStatus;
+
+		private IPAddress ipAddress;
 
 		public event VARServerEventHandler VARSERVEREVENT_Error;
 
@@ -3199,9 +3215,140 @@ namespace TestApp.Services
 			VARSERVEREVENT_StatusAutomatic?.Invoke(this, arg);
 		}
 
-		public VarComm(ILogger logger)
+		private void VSE_SaveControl(object sender, VarServerEventArgs e)
 		{
-			_logger = logger;
+			this.log.LogDebug("entering VSE_SaveControl", Array.Empty<object>());
+			switch (this.SaveBlockStatus)
+			{
+				case 0:
+					break;
+				case 1:
+					if (!this.ReceiveVarBlock(4))
+					{
+						this.log.LogError("Could not receive SafeBlockVerification!", Array.Empty<object>());
+					}
+					this.SaveBlockStatus = 0;
+					break;
+				default:
+					this.log.LogError("Wrong SaveBlockStatus in VSE_SaveControl() of MainForm!", Array.Empty<object>());
+					this.SaveBlockStatus = 0;
+					break;
+			}
+		}
+
+		private void VSE_Error(object sender, VarServerEventArgs e)
+		{
+			this.log.LogDebug("entering VSE_Error", Array.Empty<object>());
+			this.log.LogError("VSE_ERROR", e);
+		}
+
+		private void VSE_StatusAutomatic(object sender, VarServerEventArgs e)
+		{
+			this.log.LogDebug("entering VSE_StatusAutomatic", Array.Empty<object>());
+			if (!this.ReceiveVarBlock(0))
+			{
+				this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+			}
+			else
+			{
+				this.log.LogInformation("Received Status0Block", Array.Empty<object>());
+			}
+		}
+
+		private void VSE_StatusAccessControl(object sender, VarServerEventArgs e)
+		{
+			this.log.LogDebug("entering VSE_StatusAccessControl", Array.Empty<object>());
+			this.LifeSign = 0;
+			switch (this.Block1Status)
+			{
+				case 1:
+					if (!this.ReceiveVarBlock(0))
+					{
+						this.Block1Status = 0;
+						this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+						return;
+					}
+					if (this.Status0.OwnerID1 == this.Status1.RequestID)
+					{
+						this.Block1Status = 2;
+					}
+					break;
+				case 2:
+					this.Status1.VisuLive++;
+					if (this.SendVarBlock(1))
+					{
+						break;
+					}
+					this.Block1Status = 0;
+					this.log.LogError("Could not send Status1Block!", Array.Empty<object>());
+					return;
+				default:
+					this.log.LogError("Wrong Block1Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
+					this.Block1Status = 0;
+					break;
+				case 0:
+					break;
+			}
+			switch (this.Block2Status)
+			{
+				case 0:
+					break;
+				case 1:
+					if (!this.ReceiveVarBlock(0))
+					{
+						this.Block2Status = 0;
+						this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+					}
+					else if (this.Status0.OwnerID2 == this.Status2.RequestID)
+					{
+						this.Block2Status = 2;
+					}
+					break;
+				case 2:
+					this.Status2.VisuLive++;
+					if (!this.SendVarBlock(2))
+					{
+						this.Block2Status = 0;
+						this.log.LogError("Could not receive Status2Block!", Array.Empty<object>());
+					}
+					break;
+				default:
+					this.log.LogError("Wrong Block2Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
+					this.Block2Status = 0;
+					break;
+			}
+		}
+
+		private void VSE_StatControl(object sender, VarServerEventArgs e)
+		{
+			this.log.LogDebug("entering VSE_StatControl", Array.Empty<object>());
+			switch (this.StatDeleteStatus)
+			{
+				case 0:
+					break;
+				case 1:
+					if (!this.ReceiveVarBlock(33))
+					{
+						this.log.LogError("Could not receive StatControlBlock!", Array.Empty<object>());
+					}
+					this.StatDeleteStatus = 0;
+					break;
+				default:
+					this.log.LogError("Wrong StatDeleteStatus in VSE_StatControl() of MainForm", Array.Empty<object>());
+					this.StatDeleteStatus = 0;
+					break;
+			}
+		}
+
+		public VarComm(ILogger logger, IPAddress ipaddress)
+		{
+			this.VARSERVEREVENT_StatusAccessControl += this.VSE_StatusAccessControl;
+			this.VARSERVEREVENT_SaveControl += this.VSE_SaveControl;
+			this.VARSERVEREVENT_Error += this.VSE_Error;
+			this.VARSERVEREVENT_StatControl += this.VSE_StatControl;
+			this.VARSERVEREVENT_StatusAutomatic += this.VSE_StatusAutomatic;
+			this.log = logger;
+
 			SendBuffer = new byte[10000000];
 			ReadBuffer = new byte[10000000];
 			CommandBuffer = new byte[366];
@@ -3244,13 +3391,88 @@ namespace TestApp.Services
 			DownloadRequest = new DownloadRequest_Struct();
 			DownloadConfirmation = new DownloadConfirmation_Struct();
 			PlcLogBookSys = new PlcLogBookSys_Struct();
+
+			this.StartupVarConnection(ipaddress);
+			if (!this.ReceiveVarBlock(32))
+			{
+				this.log.LogError("Could not receive StatSampleBlock!", Array.Empty<object>());
+			}
+		}
+
+		private void StartupVarConnection(IPAddress ip)
+		{
+			bool flag = false;
+			string text = string.Empty;
+			char[] separator = new char[1]
+			{
+				'/'
+			};
+			this.CloseConnection();
+			this.LifeSign = 0;
+			string[] array = text.Split(separator);
+			if (this.ConnectToServer(ip))
+			{
+				if (this.ReceiveVarBlock(12))
+				{
+					switch (this.SysConst.UnitTorque)
+					{
+						case 0:
+							this.TorqueConvert = 1f;
+							this.TorqueUnitName = "TorqueNm";
+							break;
+						case 1:
+							this.TorqueConvert = 100f;
+							this.TorqueUnitName = "TorqueNcm";
+							break;
+						case 2:
+							this.TorqueConvert = 8.850745f;
+							this.TorqueUnitName = "Torqueinlb";
+							break;
+						case 3:
+							this.TorqueConvert = 0.7375621f;
+							this.TorqueUnitName = "Torqueftlb";
+							break;
+						case 4:
+							this.TorqueConvert = 141.6119f;
+							this.TorqueUnitName = "Torqueinoz";
+							break;
+						case 5:
+							this.TorqueConvert = 0.1019716f;
+							this.TorqueUnitName = "Torquekgm";
+							break;
+						case 6:
+							this.TorqueConvert = 10.19716f;
+							this.TorqueUnitName = "Torquekgcm";
+							break;
+						default:
+							this.log.LogError("Wrong SysConst.UnitTorque in StartupVarConnection() of VarComm", Array.Empty<object>());
+							this.TorqueConvert = 1f;
+							this.TorqueUnitName = "Nm";
+							break;
+					}
+				}
+				else
+				{
+					this.TorqueConvert = 1f;
+					this.TorqueUnitName = "Nm";
+					this.log.LogError("Could not receive SysConstBlock!", Array.Empty<object>());
+				}
+				if (!this.ReceiveVarBlock(0))
+				{
+					this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+				}
+			}
+			else
+			{
+				this.log.LogError("no connection to ipaddress {0}", ip.ToString());
+			}
 		}
 
 		public bool ConnectToServer(IPAddress ip)
 		{
 			if (ClientSocket != null && ClientSocket.Connected)
 			{
-				_logger.LogError("Client has already a connection to the server!\nOnly one connection is allowed.");
+				log.LogError("Client has already a connection to the server!\nOnly one connection is allowed.");
 
 				return false;
 			}
@@ -3396,7 +3618,7 @@ namespace TestApp.Services
 								num++;
 								if (num > 10)
 								{
-									_logger.LogError("Data block could not be received!");
+									log.LogError("Data block could not be received!");
 
 									break;
 								}
@@ -3521,7 +3743,7 @@ namespace TestApp.Services
 										goto IL_04c8;
 									default:
 									{
-										_logger.LogError("Implementation to determine Size of Block {0} is missing!", block.ToString());
+										log.LogError("Implementation to determine Size of Block {0} is missing!", block.ToString());
 
 										result = false;
 										break;
@@ -3537,7 +3759,7 @@ namespace TestApp.Services
 											if (num3 != (uint) (337776900 + block) ||
 											    num6 != (uint) (~(337776900 + block)))
 											{
-												_logger.LogError("Received data Block has wrong ID!");
+												log.LogError("Received data Block has wrong ID!");
 
 												result = false;
 											}
@@ -4764,7 +4986,7 @@ namespace TestApp.Services
 														goto IL_5de6;
 													default:
 													{
-														_logger.LogError("Implementation to deserialize Block {0} is missing!", block.ToString());
+														log.LogError("Implementation to deserialize Block {0} is missing!", block.ToString());
 
 														result = false;
 														break;
@@ -4790,7 +5012,7 @@ namespace TestApp.Services
 				return result;
 			}
 
-			_logger.LogError("Client has no connection to the server!");
+			log.LogError("Client has no connection to the server!");
 
 			return false;
 		}
@@ -6088,7 +6310,7 @@ namespace TestApp.Services
 							goto IL_5e01;
 						default:
 						{
-							_logger.LogError("Implementation to serialize Block {0} is missing!", block.ToString());
+							log.LogError("Implementation to serialize Block {0} is missing!", block.ToString());
 
 							result = false;
 							break;
@@ -6111,7 +6333,7 @@ namespace TestApp.Services
 				return result;
 			}
 
-			_logger.LogError("Client has no connection to the server!");
+			log.LogError("Client has no connection to the server!");
 
 			return false;
 		}
@@ -6137,7 +6359,7 @@ namespace TestApp.Services
 				}
 				catch (Exception ex)
 				{
-					_logger.LogError(ex, ex.Message);
+					log.LogError(ex, ex.Message);
 				}
 			}
 		}
@@ -6270,7 +6492,7 @@ namespace TestApp.Services
 						return -1;
 					}
 
-					_logger.LogError(ex, ex.Message);
+					log.LogError(ex, ex.Message);
 
 					return -2;
 					end_IL_0021:;
@@ -6313,7 +6535,7 @@ namespace TestApp.Services
 						return -1;
 					}
 
-					_logger.LogError(ex, ex.Message);
+					log.LogError(ex, ex.Message);
 
 					return -2;
 					end_IL_0027:;
@@ -8923,4 +9145,380 @@ namespace TestApp.Services
 			dest.ID2 = source.ID2;
 		}
 	}
+
+	public class C_CommonFunctions
+	{
+		private VarComm _varComm;
+
+		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+		public static extern short GetKeyState(int keyCode);
+
+		public C_CommonFunctions(VarComm varComm)
+		{
+			this._varComm = varComm;
+		}
+
+		public bool GetCapsLockState()
+		{
+			return ((ushort)C_CommonFunctions.GetKeyState(20) & 0xFFFF) != 0;
+		}
+
+		public string UShortToString(ushort[] letters)
+		{
+			char[] array = new char[letters.Length];
+			letters.CopyTo(array, 0);
+			int i;
+			for (i = 0; i < letters.Length && letters[i] != 0; i++)
+			{
+			}
+			string text = new string(array);
+			return text.Remove(i, letters.Length - i);
+		}
+
+		public string ByteToString(byte[] letters)
+		{
+			char[] array = new char[letters.Length];
+			letters.CopyTo(array, 0);
+			int i;
+			for (i = 0; i < letters.Length && letters[i] != 0; i++)
+			{
+			}
+			string text = new string(array);
+			return text.Remove(i, letters.Length - i);
+		}
+
+		public string ByteToAlphanumericString(byte[] letters)
+		{
+			char[] array = new char[letters.Length];
+			letters.CopyTo(array, 0);
+			for (int j = 0; j < letters.Length && letters[j] != 0; j++)
+			{
+			}
+			string text = new string(array);
+			for (int i = 0; i < text.Length; i++)
+			{
+				if (text[i] != '-' && text[i] != '_' && text[i] != ' ' && (!char.IsLetterOrDigit(text, i) || text[i] == 'Ö' || text[i] == 'ö' || text[i] == 'Ä' || text[i] == 'ä' || text[i] == 'Ü' || text[i] == 'ü' || text[i] == 'ß'))
+				{
+					text = text.Replace(text[i], ' ');
+				}
+			}
+			return text;
+		}
+
+		public void StringToUShort(ref ushort[] array, string text, int length)
+		{
+			char[] array2 = new char[length];
+			Array.Clear(array2, 0, length);
+			for (int i = 0; i < length; i++)
+			{
+				if (text == null)
+				{
+					break;
+				}
+				if (i >= text.Length)
+				{
+					break;
+				}
+				array2[i] = text[i];
+			}
+			array2.CopyTo(array, 0);
+		}
+
+		public void StringToByte(ref byte[] array, string text, int length)
+		{
+			Array.Clear(array, 0, length);
+			for (int i = 0; i < length - 1; i++)
+			{
+				if (text == null)
+				{
+					break;
+				}
+				if (i >= text.Length)
+				{
+					break;
+				}
+				char value = text[i];
+				array[i] = Convert.ToByte(value);
+			}
+		}
+
+		public string GetSwitchName(ushort param)
+		{
+			switch (param)
+			{
+				case 1:
+					return "Torque" + string.Empty;
+				case 3:
+					return "FilteredTorque" + string.Empty;
+				case 2:
+					return "RelativeTorque" + string.Empty;
+				case 11:
+					return "M360Follow" + string.Empty;
+				case 4:
+					return "Gradient" + string.Empty;
+				case 5:
+					return "Angle" + string.Empty;
+				case 6:
+					return "Time" + string.Empty;
+				case 7:
+					return "AnaDepth" + string.Empty;
+				case 10:
+					return "DepthGrad" + string.Empty;
+				case 8:
+					return "AnaSignal" + string.Empty;
+				case 9:
+					return "DigitalSignal" + string.Empty;
+				case 50:
+					return "Torque (FromAbove)";
+				case 51:
+					return "FilteredTorque (FromAbove)";
+				case 52:
+					return "Gradient (FromAbove)";
+				case 53:
+					return "AnaDepth (FromAbove)";
+				case 55:
+					return "DepthGrad (FromAbove)";
+				case 54:
+					return "AnaSignal (FromAbove)";
+				case 1000:
+					return "JumpOkTo" + string.Empty;
+				case 1001:
+					return "JumpNokTo" + string.Empty;
+				case 1002:
+					return "JumpAlwaysTo" + string.Empty;
+				case 1010:
+					return "Stop" + string.Empty;
+				case 1011:
+					return "StopOk" + string.Empty;
+				case 1012:
+					return "StopNok" + string.Empty;
+				case 1020:
+					return "ResetAngle" + string.Empty;
+				case 1030:
+					return "SetDigOut" + string.Empty;
+				case 1040:
+					return "ResetADepth" + string.Empty;
+				default:
+					return string.Empty;
+			}
+		}
+
+		public string GetSwitchUnit(ushort param)
+		{
+			switch (param)
+			{
+				case 1:
+					return this._varComm.TorqueUnitName;
+				case 3:
+					return this._varComm.TorqueUnitName;
+				case 2:
+					return this._varComm.TorqueUnitName;
+				case 11:
+					return this._varComm.TorqueUnitName;
+				case 4:
+					return this._varComm.TorqueUnitName + "/Degree";
+				case 5:
+					return "Degree" + string.Empty;
+				case 6:
+					return "Second" + string.Empty;
+				case 7:
+					return "Milimeter" + string.Empty;
+				case 10:
+					return "Milimeter/Second";
+				case 8:
+					return string.Empty;
+				case 9:
+					return string.Empty;
+				case 50:
+					return this._varComm.TorqueUnitName;
+				case 51:
+					return this._varComm.TorqueUnitName;
+				case 52:
+					return this._varComm.TorqueUnitName + "/Degree";
+				case 53:
+					return "Milimeter";
+				case 55:
+					return "Milimeter/Second";
+				case 54:
+					return string.Empty;
+				default:
+					return string.Empty;
+			}
+		}
+
+		public string GetResName(byte result)
+		{
+			switch (result)
+			{
+				case 1:
+					return "Torque";
+				case 2:
+					return "MaxTorque";
+				case 3:
+					return "FilteredTorque";
+				case 4:
+					return "Gradient";
+				case 5:
+					return "Angle";
+				case 6:
+					return "Time";
+				case 7:
+					return "AnaDepth";
+				case 9:
+					return "DigitalSignal";
+				case 12:
+					return "DepthGrad";
+				case 10:
+					return "DelayTorque";
+				case 11:
+					return "M360Follow";
+				case 8:
+					return "AnaSignal";
+				default:
+					return "NotValid";
+			}
+		}
+
+		public string GetUnlocalizedResName(byte result)
+		{
+			switch (result)
+			{
+				case 1:
+					return "Torque";
+				case 2:
+					return "MaximumTorque";
+				case 3:
+					return "FilteredTorque";
+				case 4:
+					return "TorqueGradient";
+				case 5:
+					return "Angle";
+				case 6:
+					return "Time";
+				case 7:
+					return "AnalogDepth";
+				case 9:
+					return "DigitalSignal";
+				case 12:
+					return "DepthGradient";
+				case 10:
+					return "Torque@-360°";
+				case 11:
+					return "DelayTorque";
+				case 8:
+					return "AnalogSignal";
+				default:
+					return "NotValid";
+			}
+		}
+
+		public float GetResFactor(byte result)
+		{
+			switch (result)
+			{
+				case 1:
+					return 1f;
+				case 2:
+					return 1f;
+				case 3:
+					return 1f;
+				case 4:
+					return 1f;
+				case 5:
+					return 0f;
+				case 6:
+					return 0f;
+				case 7:
+					return 0f;
+				case 9:
+					return 0f;
+				case 12:
+					return 0f;
+				case 10:
+					return 1f;
+				case 11:
+					return 1f;
+				case 8:
+					return 0f;
+				default:
+					return 0f;
+			}
+		}
+
+		public string GetResUnit(byte result, string torqueUnit)
+		{
+			switch (result)
+			{
+				case 1:
+					return torqueUnit;
+				case 2:
+					return torqueUnit;
+				case 3:
+					return torqueUnit;
+				case 4:
+					return torqueUnit + "/Degree";
+				case 5:
+					return "Degree";
+				case 6:
+					return "Second";
+				case 7:
+					return "Milimeter";
+				case 9:
+					return "EmptyString";
+				case 12:
+					return "Milimeter/Second";
+				case 10:
+					return torqueUnit;
+				case 11:
+					return torqueUnit;
+				case 8:
+					return "EmptyString";
+				default:
+					return "EmptyString";
+			}
+		}
+
+		public int GetResDigits(byte result)
+		{
+			switch (result)
+			{
+				case 1:
+					return 2;
+				case 2:
+					return 2;
+				case 3:
+					return 2;
+				case 4:
+					return 4;
+				case 5:
+					return 1;
+				case 6:
+					return 2;
+				case 7:
+					return 1;
+				case 9:
+					return 0;
+				case 12:
+					return 4;
+				case 10:
+					return 2;
+				case 11:
+					return 2;
+				case 8:
+					return 2;
+				default:
+					return 0;
+			}
+		}
+
+		public void RemoveTrailingBlanks(ref string outString, string inString)
+		{
+			char[] trimChars = new char[1]
+			{
+			' '
+			};
+			outString = inString.TrimEnd(trimChars);
+		}
+	}
+
 }

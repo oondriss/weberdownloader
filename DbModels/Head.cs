@@ -18,6 +18,7 @@ namespace TestApp.DbModels
 		public string Location { get; set; }
 		public string Hall { get; set; }
 		public string CronExp { get; set; }
+		public string Ip { get; set; }
 		public ICollection<AdditionalValue> AddidionalValues { get; set; }
 
 	}

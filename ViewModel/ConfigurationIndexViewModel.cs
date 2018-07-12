@@ -60,6 +60,9 @@ namespace TestApp.ViewModel
 		[Display(Name = "Scheduler expression")]
 		public string HeaNewCronExp { get; set; }
 
+	    [Display(Name = "Ip address")]
+		public string HeaNewIp { get; set; }
+
 	    public Dictionary<int, string> HeaNewAddColls { get; set; }
 	}
 }

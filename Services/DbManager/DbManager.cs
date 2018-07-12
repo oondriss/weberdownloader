@@ -71,7 +71,7 @@ namespace TestApp.Services
 		    return result;
 		}
 
-	    public async Task<bool> AddHead(string name, string location, string hall, string cron, Dictionary<int, string> addValues)
+	    public async Task<bool> AddHead(string name, string location, string hall, string cron, string ip, Dictionary<int, string> addValues)
 	    {
 		    
 		    
@@ -80,7 +80,8 @@ namespace TestApp.Services
 			    Name = name,
 			    Location = location,
 			    Hall = hall,
-			    CronExp = cron
+			    CronExp = cron,
+				Ip = ip
 			};
 
 			_db.Heads.Add(newHead);

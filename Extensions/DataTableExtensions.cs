@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -8,42 +9,60 @@ namespace TestApp.Extensions
 {
     public static class DataTableExtensions
     {
-	    public static string ToCsv(this DataTable dataTable)
+		public static string ToCsv(this DataTable dataTable)
 	    {
-		    var sbData = new StringBuilder();
-
-		    // Only return Null if there is no structure.
+		    StringBuilder sbData = new StringBuilder();
 		    if (dataTable.Columns.Count == 0)
+		    {
 			    return null;
-
-		    foreach (var col in dataTable.Columns)
-		    {
-			    if (col == null)
-				    sbData.Append(System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator); 
-			    else
-				    sbData.Append(col + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator);
 		    }
-
-		    sbData.Replace(System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator, Environment.NewLine, sbData.Length - 1, 1);
-
-		    foreach (DataRow dr in dataTable.Rows)
+		    foreach (object column2 in dataTable.Columns)
 		    {
-			    foreach (var column in dr.ItemArray)
+			    if (column2 == null)
+			    {
+				    sbData.Append(CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+			    }
+			    else
+			    {
+				    sbData.Append(column2 + CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+			    }
+		    }
+		    sbData.Replace(CultureInfo.CurrentCulture.TextInfo.ListSeparator, Environment.NewLine, sbData.Length - 1, 1);
+		    foreach (DataRow row in dataTable.Rows)
+		    {
+			    object[] itemArray = row.ItemArray;
+			    foreach (object column in itemArray)
 			    {
 				    if (column == null)
-					    sbData.Append(System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+				    {
+					    sbData.Append(CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+				    }
 				    else
-					    sbData.Append(column + System.Globalization.CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+				    {
+					    sbData.Append(column + CultureInfo.CurrentCulture.TextInfo.ListSeparator);
+				    }
 			    }
 			    sbData.Replace(",", Environment.NewLine, sbData.Length - 1, 1);
 		    }
-
 		    return sbData.ToString();
 	    }
 
-	    public static void AddColumns(this DataTable dataTable, IEnumerable<string> columns)
+	    public static void PrepareColumns(this DataTable dataTable, IEnumerable<string> columns, Dictionary<string, string> addColumnsWithDefaultValues)
 	    {
-		    dataTable.Columns.AddRange(columns.Select(i => new DataColumn(i)).ToArray());
+		    columns.ToList().ForEach(delegate (string i)
+		    {
+			    dataTable.Columns.Add(i, typeof(string));
+		    });
+		    foreach (KeyValuePair<string, string> addColumnsWithDefaultValue in addColumnsWithDefaultValues)
+		    {
+			    DataColumn dataColumn2 = new DataColumn(addColumnsWithDefaultValue.Key)
+			    {
+				    DataType = typeof(string),
+				    DefaultValue = addColumnsWithDefaultValue.Value
+			    };
+			    DataColumn dataColumn = dataColumn2;
+			    dataTable.Columns.Add(dataColumn);
+		    }
 	    }
-    }
+	}
 }

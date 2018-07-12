@@ -10,7 +10,7 @@ namespace TestApp.Services
 		bool IsConfigurationComplete();
 		Task<IQueryable<Head>> GetHeadsAsync();
 		Task<Head> GetHead(int id);
-		Task<bool> AddHead(string name, string location, string hall, string cron, Dictionary<int, string> addValues);
+		Task<bool> AddHead(string name, string location, string hall, string cron, string ip, Dictionary<int, string> addValues);
 		Task<bool> RemoveHeadAndAdditionalValues(int id);
 		Task<bool> RemoveAdditionalColumn(int id);
 		IEnumerable<AdditionalColumn> GetAdditionalColumns();

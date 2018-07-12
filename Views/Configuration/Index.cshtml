@@ -13,14 +13,22 @@
 			case "1":
 				tab1Active = "active";
 				tab2Active = "";
+				tab3Active = "";
 				break;
 			case "2":
 				tab1Active = "";
 				tab2Active = "active";
+				tab3Active = "";
+				break;
+			case "3":
+				tab1Active = "";
+				tab2Active = "";
+				tab3Active = "active";
 				break;
 			default:
 				tab1Active = "active";
 				tab2Active = "";
+				tab3Active = "";
 				break;
 		}
 	}
@@ -117,6 +125,9 @@
 								CronExp
 							</td>
 							<td>
+								Ip
+							</td>
+							<td>
 								Delete
 							</td>
 						</tr>
@@ -129,6 +140,7 @@
 						<td>@head.Location</td>
 						<td>@head.Hall</td>
 						<td>@head.CronExp</td>
+						<td>@head.Ip</td>
 						<td><a asp-controller="Configuration" asp-action="DeleteHead" asp-route-id="@head.Id"><span class="glyphicon glyphicon-remove"></span></a></td>
 					</tr>
 					}
@@ -151,6 +163,10 @@
 					<div class="form-group">
 						<label asp-for="HeaNewCronExp"></label>
 						<input asp-for="HeaNewCronExp" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label asp-for="HeaNewIp"></label>
+						<input asp-for="HeaNewIp" class="form-control" />
 					</div>
 					<br />
 					<table class="table table-responsive table-striped">
