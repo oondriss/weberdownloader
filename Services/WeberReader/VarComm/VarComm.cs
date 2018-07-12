@@ -2,9 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using System.Runtime.InteropServices;
 
 namespace TestApp.Services
 {
@@ -3217,137 +3217,137 @@ namespace TestApp.Services
 
 		private void VSE_SaveControl(object sender, VarServerEventArgs e)
 		{
-			this.log.LogDebug("entering VSE_SaveControl", Array.Empty<object>());
-			switch (this.SaveBlockStatus)
+			log.LogDebug("entering VSE_SaveControl", Array.Empty<object>());
+			switch (SaveBlockStatus)
 			{
 				case 0:
 					break;
 				case 1:
-					if (!this.ReceiveVarBlock(4))
+					if (!ReceiveVarBlock(4))
 					{
-						this.log.LogError("Could not receive SafeBlockVerification!", Array.Empty<object>());
+						log.LogError("Could not receive SafeBlockVerification!", Array.Empty<object>());
 					}
-					this.SaveBlockStatus = 0;
+					SaveBlockStatus = 0;
 					break;
 				default:
-					this.log.LogError("Wrong SaveBlockStatus in VSE_SaveControl() of MainForm!", Array.Empty<object>());
-					this.SaveBlockStatus = 0;
+					log.LogError("Wrong SaveBlockStatus in VSE_SaveControl() of MainForm!", Array.Empty<object>());
+					SaveBlockStatus = 0;
 					break;
 			}
 		}
 
 		private void VSE_Error(object sender, VarServerEventArgs e)
 		{
-			this.log.LogDebug("entering VSE_Error", Array.Empty<object>());
-			this.log.LogError("VSE_ERROR", e);
+			log.LogDebug("entering VSE_Error", Array.Empty<object>());
+			log.LogError("VSE_ERROR", e);
 		}
 
 		private void VSE_StatusAutomatic(object sender, VarServerEventArgs e)
 		{
-			this.log.LogDebug("entering VSE_StatusAutomatic", Array.Empty<object>());
-			if (!this.ReceiveVarBlock(0))
+			log.LogDebug("entering VSE_StatusAutomatic", Array.Empty<object>());
+			if (!ReceiveVarBlock(0))
 			{
-				this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+				log.LogError("Could not receive Status0Block!", Array.Empty<object>());
 			}
 			else
 			{
-				this.log.LogInformation("Received Status0Block", Array.Empty<object>());
+				log.LogInformation("Received Status0Block", Array.Empty<object>());
 			}
 		}
 
 		private void VSE_StatusAccessControl(object sender, VarServerEventArgs e)
 		{
-			this.log.LogDebug("entering VSE_StatusAccessControl", Array.Empty<object>());
-			this.LifeSign = 0;
-			switch (this.Block1Status)
+			log.LogDebug("entering VSE_StatusAccessControl", Array.Empty<object>());
+			LifeSign = 0;
+			switch (Block1Status)
 			{
 				case 1:
-					if (!this.ReceiveVarBlock(0))
+					if (!ReceiveVarBlock(0))
 					{
-						this.Block1Status = 0;
-						this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+						Block1Status = 0;
+						log.LogError("Could not receive Status0Block!", Array.Empty<object>());
 						return;
 					}
-					if (this.Status0.OwnerID1 == this.Status1.RequestID)
+					if (Status0.OwnerID1 == Status1.RequestID)
 					{
-						this.Block1Status = 2;
+						Block1Status = 2;
 					}
 					break;
 				case 2:
-					this.Status1.VisuLive++;
-					if (this.SendVarBlock(1))
+					Status1.VisuLive++;
+					if (SendVarBlock(1))
 					{
 						break;
 					}
-					this.Block1Status = 0;
-					this.log.LogError("Could not send Status1Block!", Array.Empty<object>());
+					Block1Status = 0;
+					log.LogError("Could not send Status1Block!", Array.Empty<object>());
 					return;
 				default:
-					this.log.LogError("Wrong Block1Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
-					this.Block1Status = 0;
+					log.LogError("Wrong Block1Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
+					Block1Status = 0;
 					break;
 				case 0:
 					break;
 			}
-			switch (this.Block2Status)
+			switch (Block2Status)
 			{
 				case 0:
 					break;
 				case 1:
-					if (!this.ReceiveVarBlock(0))
+					if (!ReceiveVarBlock(0))
 					{
-						this.Block2Status = 0;
-						this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+						Block2Status = 0;
+						log.LogError("Could not receive Status0Block!", Array.Empty<object>());
 					}
-					else if (this.Status0.OwnerID2 == this.Status2.RequestID)
+					else if (Status0.OwnerID2 == Status2.RequestID)
 					{
-						this.Block2Status = 2;
+						Block2Status = 2;
 					}
 					break;
 				case 2:
-					this.Status2.VisuLive++;
-					if (!this.SendVarBlock(2))
+					Status2.VisuLive++;
+					if (!SendVarBlock(2))
 					{
-						this.Block2Status = 0;
-						this.log.LogError("Could not receive Status2Block!", Array.Empty<object>());
+						Block2Status = 0;
+						log.LogError("Could not receive Status2Block!", Array.Empty<object>());
 					}
 					break;
 				default:
-					this.log.LogError("Wrong Block2Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
-					this.Block2Status = 0;
+					log.LogError("Wrong Block2Status in VSE_StatusAccessControl() of MainForm", Array.Empty<object>());
+					Block2Status = 0;
 					break;
 			}
 		}
 
 		private void VSE_StatControl(object sender, VarServerEventArgs e)
 		{
-			this.log.LogDebug("entering VSE_StatControl", Array.Empty<object>());
-			switch (this.StatDeleteStatus)
+			log.LogDebug("entering VSE_StatControl", Array.Empty<object>());
+			switch (StatDeleteStatus)
 			{
 				case 0:
 					break;
 				case 1:
-					if (!this.ReceiveVarBlock(33))
+					if (!ReceiveVarBlock(33))
 					{
-						this.log.LogError("Could not receive StatControlBlock!", Array.Empty<object>());
+						log.LogError("Could not receive StatControlBlock!", Array.Empty<object>());
 					}
-					this.StatDeleteStatus = 0;
+					StatDeleteStatus = 0;
 					break;
 				default:
-					this.log.LogError("Wrong StatDeleteStatus in VSE_StatControl() of MainForm", Array.Empty<object>());
-					this.StatDeleteStatus = 0;
+					log.LogError("Wrong StatDeleteStatus in VSE_StatControl() of MainForm", Array.Empty<object>());
+					StatDeleteStatus = 0;
 					break;
 			}
 		}
 
 		public VarComm(ILogger logger, IPAddress ipaddress)
 		{
-			this.VARSERVEREVENT_StatusAccessControl += this.VSE_StatusAccessControl;
-			this.VARSERVEREVENT_SaveControl += this.VSE_SaveControl;
-			this.VARSERVEREVENT_Error += this.VSE_Error;
-			this.VARSERVEREVENT_StatControl += this.VSE_StatControl;
-			this.VARSERVEREVENT_StatusAutomatic += this.VSE_StatusAutomatic;
-			this.log = logger;
+			VARSERVEREVENT_StatusAccessControl += VSE_StatusAccessControl;
+			VARSERVEREVENT_SaveControl += VSE_SaveControl;
+			VARSERVEREVENT_Error += VSE_Error;
+			VARSERVEREVENT_StatControl += VSE_StatControl;
+			VARSERVEREVENT_StatusAutomatic += VSE_StatusAutomatic;
+			log = logger;
 
 			SendBuffer = new byte[10000000];
 			ReadBuffer = new byte[10000000];
@@ -3392,10 +3392,10 @@ namespace TestApp.Services
 			DownloadConfirmation = new DownloadConfirmation_Struct();
 			PlcLogBookSys = new PlcLogBookSys_Struct();
 
-			this.StartupVarConnection(ipaddress);
-			if (!this.ReceiveVarBlock(32))
+			StartupVarConnection(ipaddress);
+			if (!ReceiveVarBlock(32))
 			{
-				this.log.LogError("Could not receive StatSampleBlock!", Array.Empty<object>());
+				log.LogError("Could not receive StatSampleBlock!", Array.Empty<object>());
 			}
 		}
 
@@ -3407,64 +3407,64 @@ namespace TestApp.Services
 			{
 				'/'
 			};
-			this.CloseConnection();
-			this.LifeSign = 0;
+			CloseConnection();
+			LifeSign = 0;
 			string[] array = text.Split(separator);
-			if (this.ConnectToServer(ip))
+			if (ConnectToServer(ip))
 			{
-				if (this.ReceiveVarBlock(12))
+				if (ReceiveVarBlock(12))
 				{
-					switch (this.SysConst.UnitTorque)
+					switch (SysConst.UnitTorque)
 					{
 						case 0:
-							this.TorqueConvert = 1f;
-							this.TorqueUnitName = "TorqueNm";
+							TorqueConvert = 1f;
+							TorqueUnitName = "TorqueNm";
 							break;
 						case 1:
-							this.TorqueConvert = 100f;
-							this.TorqueUnitName = "TorqueNcm";
+							TorqueConvert = 100f;
+							TorqueUnitName = "TorqueNcm";
 							break;
 						case 2:
-							this.TorqueConvert = 8.850745f;
-							this.TorqueUnitName = "Torqueinlb";
+							TorqueConvert = 8.850745f;
+							TorqueUnitName = "Torqueinlb";
 							break;
 						case 3:
-							this.TorqueConvert = 0.7375621f;
-							this.TorqueUnitName = "Torqueftlb";
+							TorqueConvert = 0.7375621f;
+							TorqueUnitName = "Torqueftlb";
 							break;
 						case 4:
-							this.TorqueConvert = 141.6119f;
-							this.TorqueUnitName = "Torqueinoz";
+							TorqueConvert = 141.6119f;
+							TorqueUnitName = "Torqueinoz";
 							break;
 						case 5:
-							this.TorqueConvert = 0.1019716f;
-							this.TorqueUnitName = "Torquekgm";
+							TorqueConvert = 0.1019716f;
+							TorqueUnitName = "Torquekgm";
 							break;
 						case 6:
-							this.TorqueConvert = 10.19716f;
-							this.TorqueUnitName = "Torquekgcm";
+							TorqueConvert = 10.19716f;
+							TorqueUnitName = "Torquekgcm";
 							break;
 						default:
-							this.log.LogError("Wrong SysConst.UnitTorque in StartupVarConnection() of VarComm", Array.Empty<object>());
-							this.TorqueConvert = 1f;
-							this.TorqueUnitName = "Nm";
+							log.LogError("Wrong SysConst.UnitTorque in StartupVarConnection() of VarComm", Array.Empty<object>());
+							TorqueConvert = 1f;
+							TorqueUnitName = "Nm";
 							break;
 					}
 				}
 				else
 				{
-					this.TorqueConvert = 1f;
-					this.TorqueUnitName = "Nm";
-					this.log.LogError("Could not receive SysConstBlock!", Array.Empty<object>());
+					TorqueConvert = 1f;
+					TorqueUnitName = "Nm";
+					log.LogError("Could not receive SysConstBlock!", Array.Empty<object>());
 				}
-				if (!this.ReceiveVarBlock(0))
+				if (!ReceiveVarBlock(0))
 				{
-					this.log.LogError("Could not receive Status0Block!", Array.Empty<object>());
+					log.LogError("Could not receive Status0Block!", Array.Empty<object>());
 				}
 			}
 			else
 			{
-				this.log.LogError("no connection to ipaddress {0}", ip.ToString());
+				log.LogError("no connection to ipaddress {0}", ip.ToString());
 			}
 		}
 
@@ -9155,12 +9155,12 @@ namespace TestApp.Services
 
 		public C_CommonFunctions(VarComm varComm)
 		{
-			this._varComm = varComm;
+			_varComm = varComm;
 		}
 
 		public bool GetCapsLockState()
 		{
-			return ((ushort)C_CommonFunctions.GetKeyState(20) & 0xFFFF) != 0;
+			return ((ushort)GetKeyState(20) & 0xFFFF) != 0;
 		}
 
 		public string UShortToString(ushort[] letters)
@@ -9308,15 +9308,15 @@ namespace TestApp.Services
 			switch (param)
 			{
 				case 1:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 3:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 2:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 11:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 4:
-					return this._varComm.TorqueUnitName + "/Degree";
+					return _varComm.TorqueUnitName + "/Degree";
 				case 5:
 					return "Degree" + string.Empty;
 				case 6:
@@ -9330,11 +9330,11 @@ namespace TestApp.Services
 				case 9:
 					return string.Empty;
 				case 50:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 51:
-					return this._varComm.TorqueUnitName;
+					return _varComm.TorqueUnitName;
 				case 52:
-					return this._varComm.TorqueUnitName + "/Degree";
+					return _varComm.TorqueUnitName + "/Degree";
 				case 53:
 					return "Milimeter";
 				case 55:
