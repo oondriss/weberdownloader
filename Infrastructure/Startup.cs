@@ -45,7 +45,7 @@ namespace TestApp.Infrastructure
 			services.AddMvc();
         }
 		
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DatabaseContext dabataseContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, DatabaseContext dabataseContext, IJobManager jobManager)
         {
 			loggerFactory.AddLog4Net();
 			
@@ -70,6 +70,8 @@ namespace TestApp.Infrastructure
                     "{controller=Home}/{action=Index}/{id?}");
             });
 	        dabataseContext.Database.Migrate();
-		}
+            jobManager.CreateAllHeadsJobs();
+
+        }
     }
 }

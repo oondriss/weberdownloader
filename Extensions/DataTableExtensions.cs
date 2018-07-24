@@ -42,7 +42,7 @@ namespace TestApp.Extensions
 					    sbData.Append(column + CultureInfo.CurrentCulture.TextInfo.ListSeparator);
 				    }
 			    }
-			    sbData.Replace(",", Environment.NewLine, sbData.Length - 1, 1);
+			    sbData.Replace(CultureInfo.CurrentCulture.TextInfo.ListSeparator, Environment.NewLine, sbData.Length - 1, 1);
 		    }
 		    return sbData.ToString();
 	    }

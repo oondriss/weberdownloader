@@ -40,8 +40,6 @@ namespace TestApp.Services
 		    return _db.AdditionalValues.Where(i => i.Head == head);
 	    }
 
-
-
 		public async Task<bool> RemoveHeadAndAdditionalValues(int id)
 	    {
 		    bool result;
@@ -73,8 +71,6 @@ namespace TestApp.Services
 
 	    public async Task<bool> AddHead(string name, string location, string hall, string cron, string ip, Dictionary<int, string> addValues)
 	    {
-		    
-		    
 		    var newHead = new Head
 		    {
 			    Name = name,

@@ -4,26 +4,23 @@ using Microsoft.AspNetCore.Mvc;
 using TestApp.Extensions;
 using TestApp.Services;
 using TestApp.ViewModel;
-using Microsoft.Extensions.Logging;
+using TestApp.DTO;
 
 namespace TestApp.Controllers
 {
-	public class ConfigurationController : Controller
+    public class ConfigurationController : Controller
     {
 		private readonly IDbManager _dbManager;
 	    private readonly IJobManager _jobManager;
 	    private readonly ICronValitador _cronValitador;
-	    private readonly ILogger<ConfigurationController> _logger;
 
-	    public ConfigurationController(IDbManager dbManager, 
+        public ConfigurationController(IDbManager dbManager, 
 									   IJobManager jobManager, 
-									   ICronValitador cronValitador, 
-									   ILogger<ConfigurationController> logger)
+									   ICronValitador cronValitador)
 	    {
 		    _dbManager = dbManager;
 		    _jobManager = jobManager;
 		    _cronValitador = cronValitador;
-		    _logger = logger;
 	    }
 		
         public async Task<IActionResult> Index()

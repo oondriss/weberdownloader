@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using TestApp.DTO;
 
 namespace TestApp.Extensions
 {

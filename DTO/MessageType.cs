@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestApp.Extensions
+namespace TestApp.DTO
 {
 	[Serializable]
 	public enum MessageType

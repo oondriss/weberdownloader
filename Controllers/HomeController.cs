@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using TestApp.Models;
 using TestApp.Services;
+using TestApp.ViewModel;
 
 namespace TestApp.Controllers
 {
@@ -20,8 +20,7 @@ namespace TestApp.Controllers
 			{
 				return RedirectToAction("Index", "Configuration");
 			}
-
-	        return View();
+            return Redirect("/jobs");
         }
 
         public IActionResult Error()

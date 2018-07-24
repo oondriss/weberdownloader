@@ -64,5 +64,7 @@ namespace TestApp.ViewModel
 		public string HeaNewIp { get; set; }
 
 	    public Dictionary<int, string> HeaNewAddColls { get; set; }
-	}
+
+        
+    }
 }

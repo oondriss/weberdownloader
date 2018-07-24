@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace TestApp.Extensions
+namespace TestApp.DTO
 {
 	[Serializable]
     public class MessageDefinion

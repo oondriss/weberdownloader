@@ -27,7 +27,7 @@ namespace TestApp.Services
 	    private const string Id = "ID";
 	    private const string Cycle = "Cycle";
 	    private const string Time = "DateTime";
-	    private Exception ex;
+	    private Exception _ex;
 	    private VarComm _varComm;
 	    private C_CommonFunctions _commonFunctions;
 
@@ -41,18 +41,25 @@ namespace TestApp.Services
 		public void ReadWeberData(int headId, string headName, string headLocation)
 		{
 			var logs = new List<string>();
+
+		    logs.AddLogMessage("job started {0},{1},{2}", headId, headName, headLocation);
+		    _logger.LogInformation("job started {0},{1},{2}", headId, headName, headLocation);
+
 			var dataTable = new DataTable();
 			var head = _dbManager.GetHead(headId).Result;
 			var addColumns = _dbManager.GetAdditionalColumns().OrderBy(i => i.Id).ToList();
 			var addValues = _dbManager.GetAdditionalValues(head).OrderBy(i => i.Column.Id).ToList();
 			var addCollDefaultValues = new Dictionary<string, string>();
+
 			addColumns.ForEach(i => addCollDefaultValues.Add(i.Name, addValues.FirstOrDefault(j => j.Column == i)?.Value));
-			var jobLog = new JobLog
+			
+		    var jobLog = new JobLog
 			{
 				Head = head,
 				Start = DateTime.Now
 			};
-			var columns = new List<string>
+			
+		    var columns = new List<string>
 			{
 				Nr,
 				ProgNum,
@@ -66,8 +73,6 @@ namespace TestApp.Services
 				Time
 			};
 
-			logs.AddLogMessage("job started {0},{1},{2}", headId, headName, headLocation);
-			_logger.LogInformation("job started {0},{1},{2}", headId, headName, headLocation);
 			dataTable.PrepareColumns(columns, addCollDefaultValues);
 
 			try
@@ -76,31 +81,37 @@ namespace TestApp.Services
 				_logger.LogInformation("Settuping connection to head {0} {1} {2}", head.Id, head.Name, head.Ip);
 				if (!SetupCommunicationAndAcquireData(head))
 				{
-					logs.AddLogMessage("Could not connect to screw head, exiting job!!", Array.Empty<object>());
-					_logger.LogError("Could not connect to screw head, exiting job!!", Array.Empty<object>());
+					logs.AddLogMessage("Could not connect to screw head, exiting job!!");
+					_logger.LogError("Could not connect to screw head, exiting job!!");
 					throw new ConnectionAbortedException("Could not connect to screw head, exiting job!!");
 				}
 
 				if (!ParseWeberData(ref dataTable, head))
 				{
-					logs.AddLogMessage("Could not parse screw head data, exiting job!!", Array.Empty<object>());
-					_logger.LogError("Could not parse screw head data, exiting job!!", Array.Empty<object>());
+					logs.AddLogMessage("Could not parse screw head data, exiting job!!");
+					_logger.LogError("Could not parse screw head data, exiting job!!");
 					throw new DataException("Could not parse screw head data, exiting job!!");
 				}
 
-				string contents = dataTable.ToCsv();
-				string directoryName = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+				var contents = dataTable.ToCsv();
+				var directoryName = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
 				if (directoryName != null)
 				{
-					File.WriteAllText(Path.Combine(directoryName, "Output", head.GetFileName()), contents);
+                    var outputDir = Path.Combine(directoryName, "Output");
+                    if (!Directory.Exists(outputDir))
+                    {
+                        Directory.CreateDirectory(outputDir);
+                    }
+
+                    File.WriteAllText(Path.Combine(directoryName, "Output", head.GetFileName()), contents);
 					_logger.LogInformation("Head id: {0} saved output file: {1}", head.Id, head.GetFileName());
 					logs.AddLogMessage("Head id: {0} saved output file: {1}", head.Id, head.GetFileName());
 				}
 				else
 				{
-					logs.AddLogMessage("Data downloaded, but could not find output folder, exiting job!!", Array.Empty<object>());
-					_logger.LogError("Data downloaded, but could not find output folder, exiting job!!", Array.Empty<object>());
+					logs.AddLogMessage("Data downloaded, but could not find output folder, exiting job!!");
+					_logger.LogError("Data downloaded, but could not find output folder, exiting job!!");
 					throw new InvalidOperationException("Data downloaded, but could not find output folder, exiting job!!");
 				}
 				
@@ -109,11 +120,11 @@ namespace TestApp.Services
 			}
 			catch (Exception e)
 			{
-				ex = e;
+				_ex = e;
 				jobLog.Finish = DateTime.Now;
 				jobLog.Exception = $"{e.Message}\n{e.StackTrace}";
 				jobLog.WithoutException = false;
-				logs.AddLogMessage("Error while running job for head id: {0} name: {1}", headId, headName);
+				logs.AddLogMessage("Error while running job for head id: {0} name: {1} EXCEPTION: {2}-{3}", headId, headName, e.Message, e.StackTrace);
 				_logger.LogError(e, "Error while running job for head id: {0} name: {1}", headId, headName);
 			}
 			finally
@@ -123,9 +134,10 @@ namespace TestApp.Services
 
 				jobLog.JobLogs = logs.GetLogs();
 				var res = _dbManager.AddJobLog(jobLog).Result;
-				if (ex != null)
+                if (!res) _logger.LogInformation("SaveLog save for head FAILED");
+				if (_ex != null)
 				{
-					throw ex;
+					throw _ex;
 				}
 			}
 		}
@@ -135,7 +147,7 @@ namespace TestApp.Services
 		    _varComm = new VarComm(_logger, IPAddress.Parse(head.Ip));
 		    if (!_varComm.ReceiveVarBlock(32))
 		    {
-			    _logger.LogError("Could not receive StatSampleBlock!", Array.Empty<object>());
+			    _logger.LogError("Could not receive StatSampleBlock!");
 			    return false;
 		    }
 		    _commonFunctions = new C_CommonFunctions(_varComm);
@@ -147,10 +159,10 @@ namespace TestApp.Services
 			dataTable.Rows.Clear();
 			if (_varComm.StatSample.Info.Length > 0)
 			{
-				int num5 = _varComm.StatSample.Info.Position - 1;
+				var num5 = _varComm.StatSample.Info.Position - 1;
 				try
 				{
-					for (int i = 0; i < _varComm.StatSample.Info.Length; i++)
+					for (var i = 0; i < _varComm.StatSample.Info.Length; i++)
 					{
 						var newRow = dataTable.NewRow();
 						newRow["Nr"] = i + 1;
@@ -168,8 +180,8 @@ namespace TestApp.Services
 						if ((_varComm.StatSample.Data[num5].Valid & 1) > 0)
 						{
 							empty10 = _commonFunctions.GetResName(_varComm.StatSample.Data[num5].ResultParam1) + "(" + (_varComm.StatSample.Data[num5].ResultStep1 + 1) + "): ";
-							float num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam1) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res1;
-							string str = empty10;
+							var num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam1) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res1;
+							var str = empty10;
 							num6 = Math.Round(num4, _commonFunctions.GetResDigits(_varComm.StatSample.Data[num5].ResultParam1));
 							empty10 = str + num6.ToString(CultureInfo.InvariantCulture);
 							empty10 += _commonFunctions.GetResUnit(_varComm.StatSample.Data[num5].ResultParam1, _varComm.TorqueUnitName);
@@ -182,8 +194,8 @@ namespace TestApp.Services
 						if ((_varComm.StatSample.Data[num5].Valid & 2) > 0)
 						{
 							empty10 = _commonFunctions.GetResName(_varComm.StatSample.Data[num5].ResultParam2) + "(" + (_varComm.StatSample.Data[num5].ResultStep2 + 1) + "): ";
-							float num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam2) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res2;
-							string str2 = empty10;
+							var num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam2) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res2;
+							var str2 = empty10;
 							num6 = Math.Round(num4, _commonFunctions.GetResDigits(_varComm.StatSample.Data[num5].ResultParam2));
 							empty10 = str2 + num6.ToString(CultureInfo.InvariantCulture);
 							empty10 += _commonFunctions.GetResUnit(_varComm.StatSample.Data[num5].ResultParam2, _varComm.TorqueUnitName);
@@ -196,8 +208,8 @@ namespace TestApp.Services
 						if ((_varComm.StatSample.Data[num5].Valid & 4) > 0)
 						{
 							empty10 = _commonFunctions.GetResName(_varComm.StatSample.Data[num5].ResultParam3) + "(" + (_varComm.StatSample.Data[num5].ResultStep3 + 1) + "): ";
-							float num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam3) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res3;
-							string str3 = empty10;
+							var num4 = (1f + _commonFunctions.GetResFactor(_varComm.StatSample.Data[num5].ResultParam3) * (_varComm.TorqueConvert - 1f)) * _varComm.StatSample.Data[num5].Res3;
+							var str3 = empty10;
 							num6 = Math.Round(num4, _commonFunctions.GetResDigits(_varComm.StatSample.Data[num5].ResultParam3));
 							empty10 = str3 + num6.ToString(CultureInfo.InvariantCulture);
 							empty10 += _commonFunctions.GetResUnit(_varComm.StatSample.Data[num5].ResultParam3, _varComm.TorqueUnitName);
@@ -242,9 +254,9 @@ namespace TestApp.Services
 					}
 					return true;
 				}
-				catch (Exception ex)
+				catch (Exception exi)
 				{
-					_logger.LogError(ex, "Error while loading results from head id:'{0}', name:'{1}', ip:'{2}'", head.Id, head.Name, head.Ip);
+					_logger.LogError(exi, "Error while loading results from head id:'{0}', name:'{1}', ip:'{2}'", head.Id, head.Name, head.Ip);
 					return false;
 				}
 			}

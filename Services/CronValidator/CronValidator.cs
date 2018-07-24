@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using NCrontab;
 
 namespace TestApp.Services
-{ 
-	public class CronValidator : ICronValitador
+{
+    public class CronValidator : ICronValitador
     {
 	    private readonly ILogger<CronValidator> _logger;
 
