@@ -11,12 +11,12 @@ namespace TestApp.Extensions
     {
 		public static string ToCsv(this DataTable dataTable)
 	    {
-		    StringBuilder sbData = new StringBuilder();
+		    var sbData = new StringBuilder();
 		    if (dataTable.Columns.Count == 0)
 		    {
 			    return null;
 		    }
-		    foreach (object column2 in dataTable.Columns)
+		    foreach (var column2 in dataTable.Columns)
 		    {
 			    if (column2 == null)
 			    {
@@ -30,8 +30,8 @@ namespace TestApp.Extensions
 		    sbData.Replace(CultureInfo.CurrentCulture.TextInfo.ListSeparator, Environment.NewLine, sbData.Length - 1, 1);
 		    foreach (DataRow row in dataTable.Rows)
 		    {
-			    object[] itemArray = row.ItemArray;
-			    foreach (object column in itemArray)
+			    var itemArray = row.ItemArray;
+			    foreach (var column in itemArray)
 			    {
 				    if (column == null)
 				    {
@@ -49,19 +49,14 @@ namespace TestApp.Extensions
 
 	    public static void PrepareColumns(this DataTable dataTable, IEnumerable<string> columns, Dictionary<string, string> addColumnsWithDefaultValues)
 	    {
-		    columns.ToList().ForEach(delegate (string i)
+	        columns.ToList().ForEach(i => dataTable.Columns.Add(i, typeof(string)));
+		    foreach (var addColumnsWithDefaultValue in addColumnsWithDefaultValues)
 		    {
-			    dataTable.Columns.Add(i, typeof(string));
-		    });
-		    foreach (KeyValuePair<string, string> addColumnsWithDefaultValue in addColumnsWithDefaultValues)
-		    {
-			    DataColumn dataColumn2 = new DataColumn(addColumnsWithDefaultValue.Key)
+			    dataTable.Columns.Add(new DataColumn(addColumnsWithDefaultValue.Key)
 			    {
-				    DataType = typeof(string),
-				    DefaultValue = addColumnsWithDefaultValue.Value
-			    };
-			    DataColumn dataColumn = dataColumn2;
-			    dataTable.Columns.Add(dataColumn);
+			        DataType = typeof(string),
+			        DefaultValue = addColumnsWithDefaultValue.Value
+			    });
 		    }
 	    }
 	}

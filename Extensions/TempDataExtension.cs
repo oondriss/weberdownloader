@@ -18,8 +18,7 @@ namespace TestApp.Extensions
 					MessageType = type
 				} 
 			};
-
-			//Newtonsoft.Json.JsonConvert.SerializeObject()
+            
 			var currentMessages = tempdata[AlertTag]?.ToString().Deserialize<List<MessageDefinion>>();
 			if (currentMessages != null)
 			{

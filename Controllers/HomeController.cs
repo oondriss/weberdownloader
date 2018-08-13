@@ -16,6 +16,7 @@ namespace TestApp.Controllers
 
         public IActionResult Index()
         {
+            return View();
 	        if (!_dbManager.IsConfigurationComplete())
 			{
 				return RedirectToAction("Index", "Configuration");

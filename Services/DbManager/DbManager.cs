@@ -48,7 +48,7 @@ namespace TestApp.Services
 		    {
 			    var addValuesToDelete = _db.AdditionalValues.Where(i => i.Head == itemToRemove);
 				_db.AdditionalValues.RemoveRange(addValuesToDelete);
-
+                _db.JobLogs.RemoveRange(_db.JobLogs.Where(i=>i.Head == itemToRemove));
 			    _db.Heads.Remove(itemToRemove);
 			    try
 			    {
