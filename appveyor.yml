@@ -2,14 +2,17 @@
 image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
+environment:
+  APPVEYOR_RDP_PASSWORD: weberdownloader123
+init:
+   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 before_build:
 - cmd: nuget restore
 build:
   project: TestApp.sln
-  parallel: true
   verbosity: minimal
 after_build:
-  - cmd: (robocopy C:\projects\weberdownloader\wwwroot\ C:\projects\weberdownloader\bin\Release\net461\ *.*) ^& IF %ERRORLEVEL% LSS 8 SET ERRORLEVEL = 0
+  - cmd: xcopy C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\  /sy
   - cmd: 7z a release.zip C:\projects\weberdownloader\bin\Release\net461\*.*
 artifacts:
 - path: release.zip
