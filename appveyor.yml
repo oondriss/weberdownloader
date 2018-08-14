@@ -3,9 +3,7 @@ image: Visual Studio 2017
 configuration: Release
 platform: Any CPU
 environment:
-  APPVEYOR_RDP_PASSWORD: weberdownloader123
-init:
-   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  APPVEYOR_RDP_PASSWORD: WEB3R.downloader.123.WEB3R
 before_build:
 - cmd: nuget restore
 build:
@@ -25,3 +23,5 @@ deploy:
   auth_token:
     secure: YqenUcFU4kK7iz8nABkW4hHd2RvuJkVhagYAHMyqAOrbuvdE2AUcvnX29juiCkKU
   artifact: release.zip
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
