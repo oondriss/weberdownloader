@@ -1,0 +1,32 @@
+﻿version: 1.0.{build}
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+before_build:
+- cmd: nuget restore
+build:
+  project: TestApp.sln
+  parallel: true
+  verbosity: minimal
+after_build:
+- cmd: 7z a release.zip bin\Debug\net461\*.*
+artifacts:
+- path: release.zip
+  name: WeberDownloader
+cache:
+  - packages -> **\packages.config 
+  - '%LocalAppData%\NuGet\Cache'    # NuGet < v3
+  - '%LocalAppData%\NuGet\v3-cache' # NuGet v3
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: YqenUcFU4kK7iz8nABkW4hHd2RvuJkVhagYAHMyqAOrbuvdE2AUcvnX29juiCkKU
+  artifact: release.zip
+  draft: true
+  prerelease: false
