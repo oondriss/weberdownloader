@@ -1,2 +1,15 @@
 ﻿language: csharp
 solution: TestApp.sln
+before_deploy:
+- git config --local user.name "Ondro"
+- git config --local user.email "tadanaio@gmail.com"
+- git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+- sudo apt-get install zip
+- zip -r release.zip bin/Release/net461/*
+
+deploy:
+  provider: releases
+  api_key: "c9f8179159b264240f6d689739ee184c23747d80"
+  file: "release.zip"
+  overwrite: true
+  skip_cleanup: true
