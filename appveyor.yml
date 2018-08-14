@@ -10,8 +10,8 @@ build:
   project: TestApp.sln
   verbosity: minimal
 after_build:
-  - cmd: xcopy C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\  /sy
-  - cmd: 7z a release.zip C:\projects\weberdownloader\bin\Release\net461\*.*
+  - cmd: xcopy /syf C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\
+  - cmd: 7z a release.zip C:\projects\weberdownloader\bin\Release\net461\*.* -r
 artifacts:
 - path: release.zip
   name: WeberDownloader
