@@ -9,7 +9,7 @@ build:
   parallel: true
   verbosity: minimal
 after_build:
-  - cmd: robocopy C:\projects\weberdownloader\wwwroot\ C:\projects\weberdownloader\bin\Release\net461\ /e
+  - cmd: cmd /c (robocopy C:\projects\weberdownloader\wwwroot\ C:\projects\weberdownloader\bin\Release\net461\ *.* /e) ^& IF %ERRORLEVEL% LEQ 4 exit 0
   - cmd: 7z a release.zip C:\projects\weberdownloader\bin\Release\net461\*.*
 artifacts:
 - path: release.zip
