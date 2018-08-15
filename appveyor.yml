@@ -10,10 +10,10 @@ build:
   project: TestApp.sln
   verbosity: minimal
 after_build:
-  - cmd: xcopy /syf C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\
-  - cmd: 7z a release.zip C:\projects\weberdownloader\bin\Release\net461\*.* -r
+  - cmd: xcopy /syf C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\wwwroot\
+  - cmd: 7z a -r -sfx7z.sfx release.exe C:\projects\weberdownloader\bin\Release\net461\*.*
 artifacts:
-- path: release.zip
+- path: release.exe
   name: WeberDownloader
 cache:
   - '%LocalAppData%\NuGet\Cache'    # NuGet < v3
@@ -22,6 +22,6 @@ deploy:
 - provider: GitHub
   auth_token:
     secure: YqenUcFU4kK7iz8nABkW4hHd2RvuJkVhagYAHMyqAOrbuvdE2AUcvnX29juiCkKU
-  artifact: release.zip
+  artifact: release.exe
 on_finish:
 #  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
