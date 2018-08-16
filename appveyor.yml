@@ -12,6 +12,7 @@ build:
 after_build:
   - cmd: xcopy /syf C:\projects\weberdownloader\wwwroot\*.* C:\projects\weberdownloader\bin\Release\net461\wwwroot\
   - cmd: 7z a -r -sfx7z.sfx release.exe C:\projects\weberdownloader\bin\Release\net461\*.*
+  - cmd: signtool.exe sign /f ComodoCodesigning.p12 /p object6402 /v /t http://timestamp.comodoca.com/authenticode release.exe
 artifacts:
 - path: release.exe
   name: WeberDownloader
