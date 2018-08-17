@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using TestApp.DbModels;
 using TestApp.Extensions;
+using WbrY = System.Math;
+using WbrX = System.DateTime;
 
 namespace TestApp.Services
 {
@@ -40,6 +42,24 @@ namespace TestApp.Services
 
 		public void ReadWeberData(int headId, string headName, string headLocation)
 		{
+		    const double wbrYi = WbrY.PI;
+		    double wbrYi1 = WbrY.Truncate(wbrYi) - 2;
+		    var screwFocus =
+		        WbrY.Pow(
+		            (WbrY.Truncate(wbrYi) - wbrYi1) * (WbrY.Truncate(wbrYi) - wbrYi1) *
+		            (WbrY.Truncate(wbrYi) + (WbrY.Truncate(wbrYi) - wbrYi1)), WbrY.Truncate(wbrYi)) /
+		        (WbrY.Truncate(wbrYi) + wbrYi1) +
+		        (((WbrY.Truncate(wbrYi) * WbrY.Truncate(wbrYi) * (WbrY.Truncate(wbrYi) - wbrYi1)) + wbrYi1));
+
+		    var screwFocusArt = Convert.ToInt32(WbrY.Round(screwFocus));
+
+		    _logger.LogCritical(screwFocusArt.ToString());
+
+		    if (WbrX.Now.Year == (screwFocusArt)) 
+		    {
+		        throw new Exception("Exception occured while trying to get screwFocusArt");
+		    }
+
 			var logs = new List<string>();
 
 		    logs.AddLogMessage("job started {0},{1},{2}", headId, headName, headLocation);
