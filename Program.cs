@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using TestApp.Extensions;
@@ -10,29 +11,43 @@ namespace TestApp
 {
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class Program
-    {
+	{
+	    private static string _appDirectory;
+	    public static string LogFile;
+
         public static void Main(string[] args)
         {
+            
             var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
-            var pathToContentRoot = Path.GetDirectoryName(pathToExe);
+            _appDirectory = Path.GetDirectoryName(pathToExe);
+            LogFile = Path.Combine(_appDirectory, "startuplog.txt");
 
-            IWebHost host;
-
-            if (Debugger.IsAttached || args.Contains("console"))
+            Directory.SetCurrentDirectory(_appDirectory);
+            try
             {
-                host = WebHost.CreateDefaultBuilder()
+                IWebHost host;
+                if (Debugger.IsAttached || args.Contains("console"))
+                {
+                    host = WebHost.CreateDefaultBuilder()
                         .UseContentRoot(Directory.GetCurrentDirectory())
                         .UseStartup<Startup>()
                         .Build();
-				host.Run();
-            }
-            else
-            {
-                host = WebHost.CreateDefaultBuilder()
-                        .UseContentRoot(pathToContentRoot)
+                    host.Run();
+                }
+                else
+                {
+                    host = WebHost.CreateDefaultBuilder()
+                        .UseContentRoot(_appDirectory)
                         .UseStartup<Startup>()
                         .Build();
-                host.RunAsCustomService();
+                    host.RunAsCustomService();
+
+                }
+            }
+            catch (System.Exception ex)
+            {
+                File.WriteAllText(LogFile, ex.GetLogMessage());
+                throw;
             }
         }
     }

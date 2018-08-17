@@ -9,8 +9,8 @@ using TestApp.DbModels;
 namespace TestApp.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20180708095641_AddedJobLogsColumn")]
-    partial class AddedJobLogsColumn
+    [Migration("20180816222016_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,8 @@ namespace TestApp.Migrations
                     b.Property<string>("CronExp");
 
                     b.Property<string>("Hall");
+
+                    b.Property<string>("Ip");
 
                     b.Property<string>("Location");
 

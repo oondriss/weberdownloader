@@ -21,12 +21,12 @@ namespace TestApp.Infrastructure
 
         protected override void OnStarting(string[] args)
         {
-			_logger.LogInformation("Starting new instance");
-			Debugger.Launch();
+            _logger.LogInformation("Starting new instance");
+            
             base.OnStarting(args);
         }
 
-		protected override void OnStarted()
+        protected override void OnStarted()
 		{
 			_logger.LogInformation("Started new instance");
 			base.OnStarted();

@@ -82,17 +82,20 @@ namespace TestApp.Services
 
 			_db.Heads.Add(newHead);
 
-		    foreach (var addValue in addValues)
-		    {
-			    var addColl = await _db.AdditionalColumns.FindAsync(addValue.Key);
-			    var newAddValue = new AdditionalValue
-			    {
-				    Column = addColl,
-				    Head = newHead,
-				    Value = addValue.Value
-			    };
-			    _db.AdditionalValues.Add(newAddValue);
-		    }
+	        if (addValues != null && addValues.Keys.Count > 0)
+	        {
+	            foreach (var addValue in addValues)
+	            {
+	                var addColl = await _db.AdditionalColumns.FindAsync(addValue.Key);
+	                var newAddValue = new AdditionalValue
+	                {
+	                    Column = addColl,
+	                    Head = newHead,
+	                    Value = addValue.Value
+	                };
+	                _db.AdditionalValues.Add(newAddValue);
+	            }
+	        }
 
 		    try
 		    {

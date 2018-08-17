@@ -1,4 +1,5 @@
-﻿using System.ServiceProcess;
+﻿using System.Diagnostics;
+using System.ServiceProcess;
 using Microsoft.AspNetCore.Hosting;
 using TestApp.Infrastructure;
 
@@ -8,8 +9,16 @@ namespace TestApp.Extensions
     {
         public static void RunAsCustomService(this IWebHost host)
         {
-            var webHostService = new ServiceWebHostService(host);
-            ServiceBase.Run(webHostService);
+            try
+            {
+                var webHostService = new ServiceWebHostService(host);
+                ServiceBase.Run(webHostService);
+            }
+            catch (System.Exception ex)
+            {
+                Debugger.Launch();
+                throw;
+            }
         }
     }
 }

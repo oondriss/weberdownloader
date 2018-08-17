@@ -3163,7 +3163,7 @@ namespace TestApp.Services
 
 		private byte SaveBlockStatus;
 
-		private int LifeSign;
+		//private int LifeSign;
 
 		private byte Block1Status;
 
@@ -3171,7 +3171,7 @@ namespace TestApp.Services
 
 		private byte StatDeleteStatus;
 
-		private IPAddress ipAddress;
+		//private IPAddress ipAddress;
 
 		public event VARServerEventHandler VARSERVEREVENT_Error;
 
@@ -3258,7 +3258,7 @@ namespace TestApp.Services
 		private void VSE_StatusAccessControl(object sender, VarServerEventArgs e)
 		{
 			log.LogDebug("entering VSE_StatusAccessControl", Array.Empty<object>());
-			LifeSign = 0;
+			//LifeSign = 0;
 			switch (Block1Status)
 			{
 				case 1:
@@ -3401,14 +3401,14 @@ namespace TestApp.Services
 
 		private void StartupVarConnection(IPAddress ip)
 		{
-			bool flag = false;
+			//bool flag = false;
 			string text = string.Empty;
 			char[] separator = new char[1]
 			{
 				'/'
 			};
 			CloseConnection();
-			LifeSign = 0;
+			//LifeSign = 0;
 			string[] array = text.Split(separator);
 			if (ConnectToServer(ip))
 			{

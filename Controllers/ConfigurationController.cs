@@ -13,14 +13,17 @@ namespace TestApp.Controllers
 		private readonly IDbManager _dbManager;
 	    private readonly IJobManager _jobManager;
 	    private readonly ICronValitador _cronValitador;
+        private readonly IIpValidator _ipValidator;
 
         public ConfigurationController(IDbManager dbManager, 
 									   IJobManager jobManager, 
-									   ICronValitador cronValitador)
+									   ICronValitador cronValitador,
+                                       IIpValidator ipValidator)
 	    {
 		    _dbManager = dbManager;
 		    _jobManager = jobManager;
 		    _cronValitador = cronValitador;
+	        _ipValidator = ipValidator;
 	    }
 		
         public async Task<IActionResult> Index()
@@ -106,6 +109,12 @@ namespace TestApp.Controllers
 				    return RedirectToAction("Index");
 			    }
 
+		        if (!_ipValidator.ValidateIPv4(model.HeaNewIp))
+		        {
+		            TempData.AddMessage("Error validating IP address:'" + model.HeaNewIp + "'", MessageType.Danger);
+                    TempData["tab"] = "2";
+				    return RedirectToAction("Index");
+		        }
 			    
 			    if (await _dbManager.AddHead(model.HeaNewName, model.HeaNewLocation, model.HeaNewHall, cronExpr.ToString(), model.HeaNewIp, model.HeaNewAddColls))
 			    {

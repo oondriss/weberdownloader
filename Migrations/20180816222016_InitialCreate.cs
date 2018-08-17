@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TestApp.Migrations
 {
-    public partial class InitialDatabases : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,7 +11,7 @@ namespace TestApp.Migrations
                 name: "AdditionalColumns",
                 columns: table => new
                 {
-                    Id = table.Column<int>()
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true)
@@ -25,12 +25,13 @@ namespace TestApp.Migrations
                 name: "Heads",
                 columns: table => new
                 {
-                    Id = table.Column<int>()
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: true),
                     Location = table.Column<string>(nullable: true),
                     Hall = table.Column<string>(nullable: true),
-                    CronExp = table.Column<string>(nullable: true)
+                    CronExp = table.Column<string>(nullable: true),
+                    Ip = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -41,7 +42,7 @@ namespace TestApp.Migrations
                 name: "AdditionalValues",
                 columns: table => new
                 {
-                    Id = table.Column<int>()
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     ColumnId = table.Column<int>(nullable: true),
                     HeadId = table.Column<int>(nullable: true),
@@ -68,12 +69,13 @@ namespace TestApp.Migrations
                 name: "JobLogs",
                 columns: table => new
                 {
-                    Id = table.Column<int>()
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     HeadId = table.Column<int>(nullable: true),
-                    Start = table.Column<DateTime>(),
-                    Finish = table.Column<DateTime>(),
-                    WithoutException = table.Column<bool>(),
+                    Start = table.Column<DateTime>(nullable: false),
+                    Finish = table.Column<DateTime>(nullable: false),
+                    JobLogs = table.Column<string>(nullable: true),
+                    WithoutException = table.Column<bool>(nullable: false),
                     Exception = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
