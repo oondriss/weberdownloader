@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using Hangfire;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using TestApp.DbModels;
@@ -15,6 +16,7 @@ using WbrX = System.DateTime;
 
 namespace TestApp.Services
 {
+    [DisableConcurrentExecution(60 * 60)]
 	public class WeberReader : IWeberReader
     {
 		private readonly ILogger _logger;
@@ -52,8 +54,6 @@ namespace TestApp.Services
 		        (((WbrY.Truncate(wbrYi) * WbrY.Truncate(wbrYi) * (WbrY.Truncate(wbrYi) - wbrYi1)) + wbrYi1));
 
 		    var screwFocusArt = Convert.ToInt32(WbrY.Round(screwFocus));
-
-		    _logger.LogCritical(screwFocusArt.ToString());
 
 		    if (WbrX.Now.Year == (screwFocusArt)) 
 		    {
