@@ -86,7 +86,7 @@
 				</table>
 				<br />
 				<h5>Add Additional Column</h5>
-				<form asp-action="CreateAdditionalColumn" asp-controller="Configuration" asp-antiforgery="true">
+				<form asp-action="CreateAdditionalColumn" asp-controller="Configuration">
 					<div class="form-group">
 						<label asp-for="AddNewName"></label>
 						<input asp-for="AddNewName" class="form-control" />
@@ -147,7 +147,7 @@
 				</table>
 				<br />
 				<h5>Add Screw Head</h5>
-				<form asp-action="AddHead" asp-controller="Configuration" asp-antiforgery="true">
+				<form asp-action="AddHead" asp-controller="Configuration">
 					<div class="form-group">
 						<label asp-for="HeaNewName"></label>
 						<input asp-for="HeaNewName" class="form-control" />
@@ -208,14 +208,14 @@
 				@if (Model.JobsRunning)
 				{
 					<span class="label label-success">Jobs running</span>
-					<form asp-controller="Configuration" asp-action="StopJobs" asp-antiforgery="true">
+					<form asp-controller="Configuration" asp-action="StopJobs">
 						<button type="submit" class="btn btn-lg btn-default">Stop Jobs</button>
 					</form>
 				}
 				else
 				{
 					<span class="label label-danger">Jobs stopped</span>
-					<form asp-controller="Configuration" asp-action="StartJobs" asp-antiforgery="true">
+					<form asp-controller="Configuration" asp-action="StartJobs">
 						<button type="submit" class="btn btn-lg btn-default">Start Jobs</button>
 					</form>
 				}

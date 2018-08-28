@@ -37,7 +37,6 @@ namespace TestApp.Controllers
         }
 
 	    [HttpPost]
-	    [ValidateAntiForgeryToken]
 	    public IActionResult StopJobs()
 	    {
 			if (_jobManager.RemoveAllJobs())
@@ -55,7 +54,6 @@ namespace TestApp.Controllers
 		}
 
 	    [HttpPost]
-	    [ValidateAntiForgeryToken]
 	    public async Task<IActionResult> StartJobs()
 	    {
 		    if (await _jobManager.CreateAllHeadsJobs())
@@ -95,7 +93,6 @@ namespace TestApp.Controllers
 	    }
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 	    public async Task<IActionResult> AddHead(ConfigurationIndexViewModel model)
 	    {
 		    if (ModelState.IsValid)
@@ -156,7 +153,6 @@ namespace TestApp.Controllers
 		}
 
 		[HttpPost]
-		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> CreateAdditionalColumn(ConfigurationIndexViewModel model)
 		{
 			if (ModelState.IsValid)
