@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Infrastructure\WeberEventSource.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="Migrations\20180816222016_InitialCreate.cs" />
     <Compile Include="Migrations\20180816222016_InitialCreate.Designer.cs" />
     <Compile Include="Migrations\DatabaseContextModelSnapshot.cs" />

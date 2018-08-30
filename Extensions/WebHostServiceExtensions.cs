@@ -14,7 +14,7 @@ namespace TestApp.Extensions
                 var webHostService = new ServiceWebHostService(host);
                 ServiceBase.Run(webHostService);
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
                 Debugger.Launch();
                 throw;
