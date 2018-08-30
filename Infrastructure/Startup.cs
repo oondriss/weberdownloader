@@ -5,7 +5,6 @@ using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,10 +44,7 @@ namespace TestApp.Infrastructure
                 services.AddTransient<IWeberReader, WeberReader>();
                 services.AddTransient<ICronValitador, CronValidator>();
                 services.AddTransient<IIpValidator, IpValidator>();
-                services.AddMvc();/*.AddRazorPagesOptions(o =>
-                {
-                    o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
-                });*/
+                services.AddMvc();
             }
             catch (System.Exception ex)
             {
