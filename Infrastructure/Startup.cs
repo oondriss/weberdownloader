@@ -45,10 +45,10 @@ namespace TestApp.Infrastructure
                 services.AddTransient<IWeberReader, WeberReader>();
                 services.AddTransient<ICronValitador, CronValidator>();
                 services.AddTransient<IIpValidator, IpValidator>();
-                services.AddMvc().AddRazorPagesOptions(o =>
+                services.AddMvc();/*.AddRazorPagesOptions(o =>
                 {
                     o.Conventions.ConfigureFilter(new IgnoreAntiforgeryTokenAttribute());
-                });
+                });*/
             }
             catch (System.Exception ex)
             {

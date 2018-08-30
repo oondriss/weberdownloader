@@ -45,7 +45,7 @@ namespace TestApp.Services
 
 		public void ReadWeberData(int headId, string headName, string headLocation)
 		{
-		    WeberEventSource.Log.StartService($"service started {headId},{headName},{headLocation}");
+		    //WeberEventSource.Log.StartService($"service started {headId},{headName},{headLocation}");
 
 		    const double wbrYi = WbrY.PI;
 		    var wbrYi1 = WbrY.Truncate(wbrYi) - 2;
@@ -156,9 +156,9 @@ namespace TestApp.Services
 			{
 				logs.AddLogMessage("job completed {0},{1},{2}", headId, headName, headLocation);
 				_logger.LogInformation("job completed {0},{1},{2}", headId, headName, headLocation);
-			    WeberEventSource.Log.StopService($"service finish {headId},{headName},{headLocation}");
+			    //WeberEventSource.Log.StopService($"service finish {headId},{headName},{headLocation}");
 
-                GC.Collect();
+                //GC.Collect();
 
 				jobLog.JobLogs = logs.GetLogs();
 				var res = _dbManager.AddJobLog(jobLog).Result;
@@ -179,22 +179,22 @@ namespace TestApp.Services
 
         private bool SetupCommunicationAndAcquireData(Head head)
 	    {
-	        WeberEventSource.Log.StartCommunication($"start communication to IP: {head.Ip}");
+	        //WeberEventSource.Log.StartCommunication($"start communication to IP: {head.Ip}");
 		    _varComm = new VarComm(_logger, IPAddress.Parse(head.Ip));
 		    if (!_varComm.ReceiveVarBlock(32))
 		    {
 			    _logger.LogError("Could not receive StatSampleBlock!");
-		        WeberEventSource.Log.StopCommunication($"failed communication to IP: {head.Ip}\nCould not receive StatSampleBlock!");
+		        //WeberEventSource.Log.StopCommunication($"failed communication to IP: {head.Ip}\nCould not receive StatSampleBlock!");
 			    return false;
 		    }
 		    _commonFunctions = new C_CommonFunctions();
-	        WeberEventSource.Log.StopCommunication($"succesfull communication to IP: {head.Ip}");
+	        //WeberEventSource.Log.StopCommunication($"succesfull communication to IP: {head.Ip}");
 		    return true;
 	    }
 
 		private bool ParseWeberData(ref DataTable dataTable, Head head)
 		{
-            WeberEventSource.Log.StartOutput($"Parsing data from IP:{head.Ip}");
+            //WeberEventSource.Log.StartOutput($"Parsing data from IP:{head.Ip}");
 			dataTable.Rows.Clear();
 			if (_varComm.StatSample.Info.Length > 0)
 			{
@@ -291,17 +291,17 @@ namespace TestApp.Services
 						}
 						dataTable.Rows.Add(newRow);
 					}
-				    WeberEventSource.Log.StopOutput($"Parsing done from IP:{head.Ip}");
+				    //WeberEventSource.Log.StopOutput($"Parsing done from IP:{head.Ip}");
 					return true;
 				}
 				catch (Exception exi)
 				{
-				    WeberEventSource.Log.StopOutput($"Parsing failed from IP:{head.Ip}\n{exi.Message}\n{exi.StackTrace}");
+				    //WeberEventSource.Log.StopOutput($"Parsing failed from IP:{head.Ip}\n{exi.Message}\n{exi.StackTrace}");
 					_logger.LogError(exi, "Error while loading results from head id:'{0}', name:'{1}', ip:'{2}'", head.Id, head.Name, head.Ip);
 					return false;
 				}
 			}
-		    WeberEventSource.Log.StopOutput($"Parsing failed from IP:{head.Ip}\nNo data");
+		    //WeberEventSource.Log.StopOutput($"Parsing failed from IP:{head.Ip}\nNo data");
 			_logger.LogError("No data to download in screw head id:'{0}', name:'{1}', ip:'{2}'", head.Id, head.Name, head.Ip);
 			return false;
 		}

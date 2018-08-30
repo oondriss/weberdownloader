@@ -10,7 +10,7 @@ namespace TestApp.Infrastructure
     public class WeberEventSource : EventSource
     {
         public static readonly WeberEventSource Log = new WeberEventSource();
-
+        private static readonly bool EventSourceEnabled = false;
         class Keywords
         {
             public const EventKeywords Service = (EventKeywords) 1;
@@ -26,37 +26,55 @@ namespace TestApp.Infrastructure
         [Event(1, Message = "Service starting", Level = EventLevel.Informational, Keywords = Keywords.Service, Task = Tasks.Execution)]
         public void StartService(string message)
         {
-            WriteEvent(1, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(1, message); 
+            }
         }
 
         [Event(2, Message = "Service stopping", Level = EventLevel.Informational, Keywords = Keywords.Service, Task = Tasks.Execution)]
         public void StopService(string message)
         {
-            WriteEvent(2, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(2, message); 
+            }
         }
 
         [Event(3, Message = "Communication starting", Level = EventLevel.Informational, Keywords = Keywords.Communication, Task = Tasks.Execution)]
         public void StartCommunication(string message)
         {
-            WriteEvent(3, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(3, message); 
+            }
         }
 
         [Event(4, Message = "Communication stopping", Level = EventLevel.Informational, Keywords = Keywords.Communication, Task = Tasks.Execution)]
         public void StopCommunication(string message)
         {
-            WriteEvent(4, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(4, message); 
+            }
         }
 
         [Event(5, Message = "Output starting", Level = EventLevel.Informational, Keywords = Keywords.Output, Task = Tasks.Execution)]
         public void StartOutput(string message)
         {
-            WriteEvent(5, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(5, message); 
+            }
         }
 
         [Event(6, Message = "Output stopping", Level = EventLevel.Informational, Keywords = Keywords.Output, Task = Tasks.Execution)]
         public void StopOutput(string message)
         {
-            WriteEvent(6, message);
+            if (EventSourceEnabled)
+            {
+                WriteEvent(6, message); 
+            }
         }
     }
 }
