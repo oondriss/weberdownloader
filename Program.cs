@@ -41,7 +41,6 @@ namespace TestApp
                         .UseStartup<Startup>()
                         .Build();
                     host.RunAsCustomService();
-
                 }
             }
             catch (System.Exception ex)

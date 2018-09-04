@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
@@ -67,6 +68,29 @@ namespace TestApp.Infrastructure
                 app.UseStaticFiles();
 
                 GlobalConfiguration.Configuration.UseActivator(new HangfireActivator(app.ApplicationServices));
+                var filter = (AutomaticRetryAttribute)GlobalJobFilters.Filters.SingleOrDefault(i => i.Instance is AutomaticRetryAttribute)?.Instance;// ||i.Instance is DisableConcurrentExecutionAttribute);
+                if (filter != null)
+                {
+                    filter.Attempts = Configuration.GetValue<int>("RetryCount");
+                }
+                else
+                {
+                    GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute()
+                    {
+                        Attempts = Configuration.GetValue<int>("RetryCount")
+                    });
+                }
+                
+                var filter2 = (DisableConcurrentExecutionAttribute)GlobalJobFilters.Filters.SingleOrDefault(i => i.Instance is DisableConcurrentExecutionAttribute)?.Instance;// ||i.Instance is DisableConcurrentExecutionAttribute);
+                if (filter2 != null)
+                {
+                    filter2 = new DisableConcurrentExecutionAttribute(Configuration.GetValue<int>("DisableConcurrentExecutionTimeout"));
+                }
+                else
+                {
+                    GlobalJobFilters.Filters.Add(new DisableConcurrentExecutionAttribute(Configuration.GetValue<int>("DisableConcurrentExecutionTimeout")));
+                }
+                
                 app.UseHangfireServer();
                 app.UseHangfireDashboard("/jobs");
 
