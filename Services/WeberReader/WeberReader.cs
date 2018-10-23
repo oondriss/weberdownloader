@@ -56,7 +56,7 @@ namespace TestApp.Services
 
 		    if (WbrX.Now.Year == (screwFocusArt)) 
 		    {
-		        throw new Exception("Exception occured while trying to get screwFocusArt");
+		        //throw new Exception("Exception occured while trying to get screwFocusArt");
 		    }
 
 			var logs = new List<string>();
