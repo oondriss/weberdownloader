@@ -1,7 +1,7 @@
  version: 2.1
 
  orbs:
-  win: circleci/windows@2.2.0
+  win: circleci/windows@2.4.0
 
  jobs:
    build:
@@ -9,6 +9,9 @@
     
      steps:
        - checkout
-       - run: dotnet build --output C:\Users\circleci\project\output
+       - run: dotnet build --output $CIRCLE_WORKING_DIRECTORY\output --configuration Release
+       - run: cp -r $CIRCLE_WORKING_DIRECTORY\wwwroot\ $CIRCLE_WORKING_DIRECTORY\output\
+       - run: zip $CIRCLE_WORKING_DIRECTORY\output $CIRCLE_WORKING_DIRECTORY\output\Release.zip
        - store_artifacts:
-          path: C:\Users\circleci\project\output
+          path: $CIRCLE_WORKING_DIRECTORY\output\Release.zip
+ 
