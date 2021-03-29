@@ -9,9 +9,9 @@
     
      steps:
        - checkout
-       - run: dotnet build --output $CIRCLE_WORKING_DIRECTORY\output --configuration Release
-       - run: cp -r $CIRCLE_WORKING_DIRECTORY\wwwroot\ $CIRCLE_WORKING_DIRECTORY\output\
-       - run: zip $CIRCLE_WORKING_DIRECTORY\output $CIRCLE_WORKING_DIRECTORY\output\Release.zip
+       - run: dotnet build --output C:\Users\circleci\project\output --configuration Release
+       - run: cp -r C:\Users\circleci\project\wwwroot\ C:\Users\circleci\project\output\
+       - run: zip C:\Users\circleci\project\output C:\Users\circleci\project\output\Release.zip
        - store_artifacts:
-          path: $CIRCLE_WORKING_DIRECTORY\output\Release.zip
+          path: C:\Users\circleci\project\output\Release.zip
  
