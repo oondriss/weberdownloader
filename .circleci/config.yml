@@ -9,4 +9,6 @@
     
      steps:
        - checkout
-       - run: dotnet build
+       - run: dotnet build --output C:\Users\circleci\project\output
+       - store_artifacts:
+          path: C:\Users\circleci\project\output
