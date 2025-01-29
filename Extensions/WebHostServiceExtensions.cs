@@ -1,24 +1,21 @@
-﻿using System.Diagnostics;
-using System.ServiceProcess;
-using Microsoft.AspNetCore.Hosting;
+﻿using System.ServiceProcess;
 using TestApp.Infrastructure;
 
-namespace TestApp.Extensions
+namespace TestApp.Extensions;
+
+public static class WebHostServiceExtensions
 {
-	public static class WebHostServiceExtensions
+    public static void RunAsCustomService(this IWebHost host)
     {
-        public static void RunAsCustomService(this IWebHost host)
+        try
         {
-            try
-            {
-                var webHostService = new ServiceWebHostService(host);
-                ServiceBase.Run(webHostService);
-            }
-            catch (System.Exception)
-            {
-                Debugger.Launch();
-                throw;
-            }
+            ServiceWebHostService webHostService = new(host);
+            ServiceBase.Run(webHostService);
+        }
+        catch (System.Exception)
+        {
+            _ = Debugger.Launch();
+            throw;
         }
     }
 }

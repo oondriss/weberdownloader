@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class SerialPortSettingStruct
-		{
-			public uint BaudRate;
+    [Serializable]
+    public class SerialPortSettingStruct
+    {
+        public uint BaudRate;
 
-			public byte Parity;
+        public byte Parity;
 
-			public SerialPortSettingStruct()
-			{
-				Initialize();
-			}
+        public SerialPortSettingStruct()
+        {
+            Initialize();
+        }
 
-			public void Initialize()
-			{
-				BaudRate = 0u;
-				Parity = 0;
-			}
-		}
-	}
+        public void Initialize()
+        {
+            BaudRate = 0u;
+            Parity = 0;
+        }
+    }
 }

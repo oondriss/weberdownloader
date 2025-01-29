@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class Status2_Struct
-		{
-			public uint RequestID;
+    [Serializable]
+    public class Status2_Struct
+    {
+        public uint RequestID;
 
-			public ushort VisuLive;
+        public ushort VisuLive;
 
-			public Status2_Struct()
-			{
-				Initialize();
-			}
+        public Status2_Struct()
+        {
+            Initialize();
+        }
 
-			public void Initialize()
-			{
-				RequestID = 0u;
-				VisuLive = 0;
-			}
-		}
-	}
+        public void Initialize()
+        {
+            RequestID = 0u;
+            VisuLive = 0;
+        }
+    }
 }

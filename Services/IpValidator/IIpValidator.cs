@@ -1,7 +1,6 @@
-﻿namespace TestApp.Services
+﻿namespace TestApp.Services.IpValidator;
+
+public interface IIpValidator
 {
-    public interface IIpValidator
-    {
-        bool ValidateIPv4(string ipString);
-    }
+    bool ValidateIPv4(string ipString);
 }

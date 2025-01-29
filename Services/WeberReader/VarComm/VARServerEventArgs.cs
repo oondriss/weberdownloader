@@ -1,16 +1,13 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services.WeberReader.VarComm;
+
+public class VarServerEventArgs : EventArgs
 {
-	public class VarServerEventArgs : EventArgs
-	{
-		private ushort Block;
+    public ushort GetBlockNo { get; }
 
-		public ushort GetBlockNo => Block;
-
-		public VarServerEventArgs(ushort bl)
-		{
-			Block = bl;
-		}
-	}
+    public VarServerEventArgs(ushort bl)
+    {
+        GetBlockNo = bl;
+    }
 }

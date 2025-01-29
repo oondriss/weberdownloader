@@ -1,26 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TestApp.Services;
 using TestApp.ViewModel;
 
-namespace TestApp.Controllers
+namespace TestApp.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    public IActionResult Index()
     {
-        public HomeController(IDbManager dbManager)
-		{
-		}
+        return View();
+    }
 
-        public IActionResult Index()
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel
         {
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-			return View(new ErrorViewModel
-			{
-				RequestId = HttpContext.TraceIdentifier
-			});
-        }
+            RequestId = HttpContext.TraceIdentifier
+        });
     }
 }

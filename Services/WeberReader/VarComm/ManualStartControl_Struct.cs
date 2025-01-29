@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class ManualStartControl_Struct
-		{
-			public byte Command;
+    [Serializable]
+    public class ManualStartControl_Struct
+    {
+        public byte Command;
 
-			public uint ProgNum;
+        public uint ProgNum;
 
-			public ManualStartControl_Struct()
-			{
-				Initialize();
-			}
+        public ManualStartControl_Struct()
+        {
+            Initialize();
+        }
 
-			public void Initialize()
-			{
-				Command = 0;
-				ProgNum = 0u;
-			}
-		}
-	}
+        public void Initialize()
+        {
+            Command = 0;
+            ProgNum = 0u;
+        }
+    }
 }

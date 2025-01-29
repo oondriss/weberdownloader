@@ -1,18 +1,17 @@
-﻿namespace TestApp.Services
+﻿namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        private struct VARCOMMCommand
-		{
-			public uint ID1;
+    private struct VARCOMMCommand
+    {
+        public uint ID1;
 
-			public sbyte Direction;
+        public sbyte Direction;
 
-			public ushort Block;
+        public ushort Block;
 
-			public byte[] Event;
+        public byte[] Event;
 
-			public uint ID2;
-		}
-	}
+        public uint ID2;
+    }
 }

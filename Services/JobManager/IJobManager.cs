@@ -1,11 +1,10 @@
 ﻿using System.Threading.Tasks;
 
-namespace TestApp.Services
+namespace TestApp.Services.JobManager;
+
+public interface IJobManager
 {
-	public interface IJobManager
-	{
-		Task<bool> CreateAllHeadsJobs();
-		bool RemoveAllJobs();
-		bool IsJobsRunning();
-	}
+    Task<bool> CreateAllHeadsJobs();
+    bool RemoveAllJobs();
+    bool IsJobsRunning();
 }

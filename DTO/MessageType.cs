@@ -1,13 +1,12 @@
 ﻿using System;
 
-namespace TestApp.DTO
+namespace TestApp.DTO;
+
+[Serializable]
+public enum MessageType
 {
-	[Serializable]
-	public enum MessageType
-	{
-		Success = 0,
-		Info,
-		Warning,
-		Danger
-	}
+    Success = 0,
+    Info,
+    Warning,
+    Danger
 }

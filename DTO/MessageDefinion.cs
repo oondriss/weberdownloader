@@ -1,36 +1,30 @@
 ﻿using System;
 using System.Xml.Serialization;
 
-namespace TestApp.DTO
+namespace TestApp.DTO;
+
+[Serializable]
+public class MessageDefinion
 {
-	[Serializable]
-    public class MessageDefinion
-	{
-		[XmlElement] public MessageType MessageType;// { private get; set; }
+    [XmlElement] public MessageType MessageType;// { private get; set; }
 
-		[XmlElement] public string Message;// { get; set; }
+    [XmlElement] public string Message;// { get; set; }
 
-		public string Type()
-		{	
-			switch (MessageType)
-			{
-				case MessageType.Success:
-					return "alert-success";
-				case MessageType.Info:
-					return "alert-info";
-				case MessageType.Warning:
-					return "alert-warning";
-				case MessageType.Danger:
-					return "alert-danger";
-				default:
-					return "alert-info";
-			}
-		}
-		
-		public string TypeStr()
-		{
-			return Enum.GetName(MessageType.GetType(), MessageType);
-		}
-		
+    public string Type()
+    {
+        return MessageType switch
+        {
+            MessageType.Success => "alert-success",
+            MessageType.Info => "alert-info",
+            MessageType.Warning => "alert-warning",
+            MessageType.Danger => "alert-danger",
+            _ => "alert-info",
+        };
     }
+
+    public string TypeStr()
+    {
+        return Enum.GetName(MessageType.GetType(), MessageType);
+    }
+
 }

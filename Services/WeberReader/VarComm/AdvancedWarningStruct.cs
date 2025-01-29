@@ -1,38 +1,22 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class AdvancedWarningStruct
-		{
-			public byte[] Name;
+    [Serializable]
+    public class AdvancedWarningStruct
+    {
+        public byte[] Name = new byte[32];
 
-			public uint Limit;
+        public uint Limit = 9999999u;
 
-			public uint Advance;
+        public uint Advance = 0u;
 
-			public DateTimeStruct AdvancedWarningTime;
+        public DateTimeStruct AdvancedWarningTime = new();
 
-			public uint AdvancedDays;
+        public uint AdvancedDays = 0u;
 
-			public byte EnableAdvancedWarningTime;
-
-			public AdvancedWarningStruct()
-			{
-				Initialize();
-			}
-
-			public void Initialize()
-			{
-				Name = new byte[32];
-				Limit = 9999999u;
-				Advance = 0u;
-				AdvancedWarningTime = new DateTimeStruct();
-				AdvancedDays = 0u;
-				EnableAdvancedWarningTime = 0;
-			}
-		}
-	}
+        public byte EnableAdvancedWarningTime = 0;
+    }
 }

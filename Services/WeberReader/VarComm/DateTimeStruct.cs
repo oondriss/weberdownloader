@@ -1,38 +1,37 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class DateTimeStruct
-		{
-			public ushort Year;
+    [Serializable]
+    public class DateTimeStruct
+    {
+        public ushort Year;
 
-			public byte Month;
+        public byte Month;
 
-			public byte Day;
+        public byte Day;
 
-			public byte Hour;
+        public byte Hour;
 
-			public byte Minute;
+        public byte Minute;
 
-			public byte Second;
+        public byte Second;
 
-			public DateTimeStruct()
-			{
-				Initialize();
-			}
+        public DateTimeStruct()
+        {
+            Initialize();
+        }
 
-			public void Initialize()
-			{
-				Year = 0;
-				Month = 0;
-				Day = 0;
-				Hour = 0;
-				Minute = 0;
-				Second = 0;
-			}
-		}
-	}
+        public void Initialize()
+        {
+            Year = 0;
+            Month = 0;
+            Day = 0;
+            Hour = 0;
+            Minute = 0;
+            Second = 0;
+        }
+    }
 }

@@ -1,26 +1,25 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class StatSampleInfoStruct
-		{
-			public ushort Length;
+    [Serializable]
+    public class StatSampleInfoStruct
+    {
+        public ushort Length;
 
-			public ushort Position;
+        public ushort Position;
 
-			public StatSampleInfoStruct()
-			{
-				Initialize();
-			}
+        public StatSampleInfoStruct()
+        {
+            Initialize();
+        }
 
-			public void Initialize()
-			{
-				Length = 0;
-				Position = 0;
-			}
-		}
-	}
+        public void Initialize()
+        {
+            Length = 0;
+            Position = 0;
+        }
+    }
 }

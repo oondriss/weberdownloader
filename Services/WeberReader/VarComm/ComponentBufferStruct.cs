@@ -1,44 +1,26 @@
 ﻿using System;
 
-namespace TestApp.Services
+namespace TestApp.Services;
+
+public partial class VarComm
 {
-    public partial class VarComm
-	{
-        [Serializable]
-		public class ComponentBufferStruct
-		{
-			public ushort[] userName;
+    [Serializable]
+    public class ComponentBufferStruct
+    {
+        public ushort[] userName = new ushort[5];
 
-			public DateTimeStruct Time;
+        public DateTimeStruct Time = new();
 
-			public ushort[] ComponentOrPartText;
+        public ushort[] ComponentOrPartText = new ushort[100];
 
-			public ushort[] ReasonText;
+        public ushort[] ReasonText = new ushort[100];
 
-			public ushort[] SerialNumber;
+        public ushort[] SerialNumber = new ushort[31];
 
-			public byte NewEntry;
+        public byte NewEntry = 0;
 
-			public uint PieceCount;
+        public uint PieceCount = 0u;
 
-			public uint Cycle;
-
-			public ComponentBufferStruct()
-			{
-				Initialize();
-			}
-
-			public void Initialize()
-			{
-				userName = new ushort[5];
-				Time = new DateTimeStruct();
-				ComponentOrPartText = new ushort[100];
-				ReasonText = new ushort[100];
-				SerialNumber = new ushort[31];
-				NewEntry = 0;
-				PieceCount = 0u;
-				Cycle = 0u;
-			}
-		}
-	}
+        public uint Cycle = 0u;
+    }
 }

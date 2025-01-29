@@ -1,9 +1,8 @@
 ﻿using NCrontab;
 
-namespace TestApp.Services
+namespace TestApp.Services.CronValidator;
+
+public interface ICronValitador
 {
-	public interface ICronValitador
-	{
-		CrontabSchedule ValidateCron(string cron);
-	}
+    CrontabSchedule ValidateCron(string cron);
 }

@@ -1,7 +1,6 @@
-﻿namespace TestApp.Services
+﻿namespace TestApp.Services.WeberReader;
+
+public interface IWeberReader
 {
-	public interface IWeberReader
-	{
-		void ReadWeberData(int headId, string headName, string headLocation);
-	}
+    void ReadWeberData(int headId, string headName, string headLocation);
 }
